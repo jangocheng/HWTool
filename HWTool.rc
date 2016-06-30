@@ -1,0 +1,362 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\HWTool.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\HWTool.ico"
+IDR_SN                  ICON                    "res\\sn.ico"
+IDR_BIOS                ICON                    "res\\bios.ico"
+IDR_KEY                 ICON                    "res\\key.ico"
+IDR_OA                  ICON                    "res\\oa.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_HWTOOL_DIALOG DIALOGEX 0, 0, 332, 212
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST | WS_EX_APPWINDOW
+CAPTION "HuiWeiTool"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,0,0,332,14
+END
+
+IDD_BIOS DIALOGEX 0, 0, 332, 198
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+EXSTYLE WS_EX_ACCEPTFILES
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "BIOS信息",IDC_STATIC,2,0,327,94
+    RTEXT           "BIOS供应商：",IDC_STATIC,5,19,49,8
+    CONTROL         "",IDC_STATIC,"Static",SS_GRAYFRAME,165,4,1,89,WS_EX_STATICEDGE
+    RTEXT           "BIOS版本：",IDC_STATIC,13,37,41,8
+    RTEXT           "BIOS日期：",IDC_STATIC,13,55,41,8
+    RTEXT           "BIOS哈希：",IDC_STATIC,13,73,41,8
+    RTEXT           "制造商：",IDC_STATIC,185,19,33,8
+    RTEXT           "产品型号：",IDC_STATIC,177,37,41,8
+    RTEXT           "产品序列号：",IDC_STATIC,169,55,49,8
+    RTEXT           "主板制造商：",IDC_STATIC,169,73,49,8
+    LTEXT           "",IDC_IBV,59,19,100,8
+    LTEXT           "",IDC_BIOSVER,59,37,100,8
+    LTEXT           "",IDC_BIOSDATE,59,55,100,8
+    LTEXT           "",IDC_BIOSHASH,59,73,100,8
+    LTEXT           "",IDC_PID,221,19,100,8
+    LTEXT           "",IDC_MODEL,221,37,100,8
+    LTEXT           "",IDC_SERIALNUM,221,55,100,8
+    LTEXT           "",IDC_MBPID,221,73,100,8
+    EDITTEXT        IDC_FW,61,133,193,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "BIOS固件：",IDC_STATIC,18,135,41,8
+    PUSHBUTTON      "浏览...",IDC_BROWSE,261,131,52,16
+    PUSHBUTTON      "更新",IDC_UPDATE,138,160,54,16
+    LTEXT           "",IDC_STATUS,0,186,331,12,SS_SUNKEN
+    CONTROL         "保留序列号",IDC_SNCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,255,112,56,10
+END
+
+IDD_DPK DIALOGEX 0, 0, 332, 198
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "微软OEM/ODM密钥信息",IDC_STATIC,2,117,327,79
+    LTEXT           "产品 ID:",IDC_STATIC,68,130,28,9
+    EDITTEXT        IDC_PKID,101,128,165,13,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "查询",IDC_QUERY,52,152,44,15
+    EDITTEXT        IDC_DPK,101,153,165,13,ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "BIOS信息",IDC_STATIC,2,0,327,94
+    RTEXT           "BIOS供应商：",IDC_STATIC,5,19,49,8
+    CONTROL         "",IDC_STATIC,"Static",SS_GRAYFRAME,165,4,1,89,WS_EX_STATICEDGE
+    RTEXT           "BIOS版本：",IDC_STATIC,13,37,41,8
+    RTEXT           "BIOS日期：",IDC_STATIC,13,55,41,8
+    RTEXT           "BIOS哈希：",IDC_STATIC,13,73,41,8
+    RTEXT           "制造商：",IDC_STATIC,185,19,33,8
+    RTEXT           "产品型号：",IDC_STATIC,177,37,41,8
+    RTEXT           "产品序列号：",IDC_STATIC,169,55,49,8
+    RTEXT           "主板制造商：",IDC_STATIC,169,73,49,8
+    LTEXT           "",IDC_IBV,59,19,100,8
+    LTEXT           "",IDC_BIOSVER,59,37,100,8
+    LTEXT           "",IDC_BIOSDATE,59,55,100,8
+    LTEXT           "",IDC_BIOSHASH,59,73,100,8
+    LTEXT           "",IDC_PID,221,19,100,8
+    LTEXT           "",IDC_MODEL,221,37,100,8
+    LTEXT           "",IDC_SERIALNUM,221,55,100,8
+    LTEXT           "",IDC_MBPID,221,73,100,8
+    EDITTEXT        IDC_DPKSAVE,101,178,165,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "烧录",IDC_INJECT,52,177,44,15
+END
+
+IDD_SN DIALOGEX 0, 0, 332, 198
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_FW,76,131,193,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "更新",IDC_UPDATE,138,159,54,17
+    GROUPBOX        "BIOS信息",IDC_STATIC,2,0,327,94
+    RTEXT           "BIOS供应商：",IDC_STATIC,5,19,49,8
+    CONTROL         "",IDC_STATIC,"Static",SS_GRAYFRAME,165,4,1,89,WS_EX_STATICEDGE
+    RTEXT           "BIOS版本：",IDC_STATIC,13,37,41,8
+    RTEXT           "BIOS日期：",IDC_STATIC,13,55,41,8
+    RTEXT           "BIOS哈希：",IDC_STATIC,13,73,41,8
+    RTEXT           "制造商：",IDC_STATIC,185,19,33,8
+    RTEXT           "产品型号：",IDC_STATIC,177,37,41,8
+    RTEXT           "产品序列号：",IDC_STATIC,169,55,49,8
+    RTEXT           "主板制造商：",IDC_STATIC,169,73,49,8
+    LTEXT           "",IDC_IBV,59,19,100,8
+    LTEXT           "",IDC_BIOSVER,59,37,100,8
+    LTEXT           "",IDC_BIOSDATE,59,55,100,8
+    LTEXT           "",IDC_BIOSHASH,59,73,100,8
+    LTEXT           "",IDC_PID,221,19,100,8
+    LTEXT           "",IDC_MODEL,221,37,100,8
+    LTEXT           "",IDC_SERIALNUM,221,55,100,8
+    LTEXT           "",IDC_MBPID,221,73,100,8
+    RTEXT           "序列号：",IDC_STATIC,38,133,33,8
+END
+
+IDD_OADLG DIALOGEX 0, 0, 332, 198
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_SERVIP,"SysIPAddress32",WS_TABSTOP,40,16,96,12
+    EDITTEXT        IDC_PWD,174,16,78,12,ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "LicensablePart",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,27,59,62,10
+    CONTROL         "OEMPO",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,94,59,40,10
+    CONTROL         "OEMPart",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,139,59,44,10
+    EDITTEXT        IDC_SELNUMBER,194,57,120,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_BUSINESS,59,79,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_MODEL,235,79,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_TYPE,59,97,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_SUBTYPE,235,97,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_SCREEN,59,115,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_TOUCH,235,115,78,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "业务名称:",IDC_STATIC,17,82,36,8
+    LTEXT           "外观类型:",IDC_STATIC,17,99,36,8
+    LTEXT           "屏幕尺寸:",IDC_STATIC,17,116,36,8
+    LTEXT           "机器型号:",IDC_STATIC,194,82,36,8
+    LTEXT           "外观子项:",IDC_STATIC,194,99,36,8
+    LTEXT           "触摸功能:",IDC_STATIC,194,116,36,8
+    GROUPBOX        "",IDC_STATIC,17,51,169,22
+    GROUPBOX        "KEY配置信息",IDC_STATIC,2,42,327,94
+    GROUPBOX        "服务器选项",IDC_STATIC,2,2,327,36
+    PUSHBUTTON      "配置",IDC_CONNECT,265,14,50,15
+    RTEXT           "IP地址:",IDC_STATIC,6,18,29,8
+    RTEXT           "密码:",IDC_STATIC,150,18,21,8
+    LTEXT           "Product Key ID:",IDC_STATIC,16,157,52,8
+    EDITTEXT        IDC_PKID,70,155,108,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "擦除Key",IDC_ERASE,195,154,50,15
+    PUSHBUTTON      "烧写Key",IDC_INJECT,264,154,50,15
+    LTEXT           "",IDC_STATUS,0,186,331,12,SS_SUNKEN
+END
+
+IDD_CFG DIALOGEX 0, 0, 285, 138
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "服务器DPK配置"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "保存",IDOK,118,111,50,15
+    LTEXT           "屏幕尺寸:",IDC_STATIC,19,85,36,8
+    LTEXT           "外观类型:",IDC_STATIC,19,63,36,8
+    LTEXT           "机器型号:",IDC_STATIC,150,41,36,8
+    LTEXT           "触摸功能:",IDC_STATIC,150,85,36,8
+    LTEXT           "业务名称:",IDC_STATIC,19,41,36,8
+    LTEXT           "外观子项:",IDC_STATIC,150,63,36,8
+    COMBOBOX        IDC_BUSINESS,57,38,72,92,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_TYPE,57,61,72,72,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_SUBTYPE,189,61,72,74,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_TOUCH,189,82,72,52,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_MODEL,189,38,72,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SCREEN,57,83,72,13,ES_AUTOHSCROLL
+    CONTROL         "LicensablePart",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,24,14,62,10
+    CONTROL         "OEMPO",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,90,14,40,10
+    CONTROL         "OEMPart",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,135,14,44,10
+    GROUPBOX        "",IDC_STATIC,19,6,159,22
+    COMBOBOX        IDC_SELNUMBER,189,13,72,82,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_WAITDLG DIALOGEX 0, 0, 84, 22
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "正在连接，请稍候......",IDC_STATIC,1,7,81,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x21L
+#else
+ FILEFLAGS 0x20L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
+            VALUE "FileDescription", "Authorized by Kelvin Cheng"
+            VALUE "FileVersion", "1.0"
+            VALUE "InternalName", "HWTool.exe"
+            VALUE "LegalCopyright", "Copyright (C) 2016"
+            VALUE "LegalTrademarks", "Techvision"
+            VALUE "OriginalFilename", "HWTool.exe"
+            VALUE "ProductName", "HWTool Application"
+            VALUE "ProductVersion", "1.0"
+            VALUE "SpecialBuild", "1.0.10586.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DATA
+//
+
+IDR_AFUWIN              DATA                    "res\\ami\\afuwin.exe"
+IDR_AMIDEWIN            DATA                    "res\\ami\\amidewin.exe"
+IDR_AMIFLDRV32          DATA                    "res\\ami\\amifldrv32.sys"
+IDR_AMIFLDRV64          DATA                    "res\\ami\\amifldrv64.sys"
+IDR_CHECK               DATA                    "res\\ami\\Check.exe"
+IDR_FPARTS1             DATA                    "res\\byt\\fparts.txt"
+IDR_FPTW1               DATA                    "res\\byt\\fptw.exe"
+IDR_IDRVDLL             DATA                    "res\\byt\\Idrvdll.dll"
+IDR_PMXDLL              DATA                    "res\\byt\\Pmxdll.dll"
+IDR_FPARTS2             DATA                    "res\\cht86\\fparts.txt"
+IDR_FPTW2               DATA                    "res\\cht86\\fptw.exe"
+IDR_FPTW3               DATA                    "res\\cht64\\fptw64.exe"
+IDR_IDRVDLL32E          DATA                    "res\\cht64\\idrvdll32e.DLL"
+IDR_PMXDLL32E           DATA                    "res\\cht64\\pmxdll32e.DLL"
+IDR_OACFG               DATA                    "res\\ami\\OA3ToolFile.cfg"
+IDR_OATOOL              DATA                    "res\\ami\\oa3tool.exe"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_CFG DLGINIT
+BEGIN
+    IDC_TYPE, 0x403, 8, 0
+0x6544, 0x6b73, 0x6f74, 0x0070, 
+    IDC_TYPE, 0x403, 9, 0
+0x6f4e, 0x6574, 0x6f62, 0x6b6f, "\000" 
+    IDC_TYPE, 0x403, 7, 0
+0x6154, 0x6c62, 0x7465, "\000" 
+    IDC_TOUCH, 0x403, 6, 0
+0x6f54, 0x6375, 0x0068, 
+    IDC_TOUCH, 0x403, 10, 0
+0x6f4e, 0x2d6e, 0x6f74, 0x6375, 0x0068, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
+END
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\HWTool.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
