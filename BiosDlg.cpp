@@ -45,7 +45,7 @@ void CBiosDlg::OnPaint()
 	CRect m_rDataBox(40,180,380,201);
 	CFont m_LogoFont;
 	CString sLogoString = m_wszCpuInfo;
-	sLogoString += m_bIsx64 ? TEXT(" | 64bits") : TEXT(" | 32bits");
+	sLogoString += m_bIsx64 ? TEXT(" - 64bits") : TEXT(" - 32bits");
   	m_LogoFont.CreateFont(18, 0, 0, 0, FW_BOLD, 1, FALSE, FALSE,
 	  ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 	  FIXED_PITCH | FF_ROMAN, TEXT("Times New Roman"));
@@ -135,7 +135,7 @@ void CBiosDlg::OnBnClickedUpdate()
 	}
 	if (pFw == NULL)
 	{
-		MessageBox(TEXT("Did not support current platform!"),TEXT("Error"),MB_ICONERROR);
+		MessageBox(TEXT("不支持当前平台！"),TEXT("错误"),MB_ICONERROR);
 		EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 		GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 		GetDlgItem(IDC_SNCHECK)->EnableWindow();
@@ -153,7 +153,7 @@ void CBiosDlg::OnBnClickedUpdate()
 	GetDlgItem(IDC_BROWSE)->EnableWindow(0);
 	if (m_szPath.GetLength()<=0) 
 	{
-		MessageBox(TEXT("No bios firmware found!"),TEXT("Error"),MB_ICONSTOP);
+		MessageBox(TEXT("未发现BIOS文件！"),TEXT("错误"),MB_ICONSTOP);
 		EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 		GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 		GetDlgItem(IDC_SNCHECK)->EnableWindow();
@@ -164,7 +164,7 @@ void CBiosDlg::OnBnClickedUpdate()
 	CFile fp;
 	if (!fp.Open(m_szPath,CFile::modeRead|CFile::typeBinary))
 	{
-		MessageBox(TEXT("Bios file not found!"),TEXT("Error"),MB_ICONERROR);
+		MessageBox(TEXT("未发现BIOS文件"),TEXT("错误"),MB_ICONERROR);
 		EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 		GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 		GetDlgItem(IDC_SNCHECK)->EnableWindow();
@@ -175,7 +175,7 @@ void CBiosDlg::OnBnClickedUpdate()
 	ULONG len=(ULONG)fp.GetLength();
 	if (len != 8388608)
 	{
-		MessageBox(TEXT("Bios file is invalid!"),TEXT("Error"),MB_ICONERROR);
+		MessageBox(TEXT("无效的BIOS文件"),TEXT("错误"),MB_ICONERROR);
 		EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 		GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 		GetDlgItem(IDC_SNCHECK)->EnableWindow();
@@ -188,7 +188,7 @@ void CBiosDlg::OnBnClickedUpdate()
 	fp.Read(buff,16);
 	if (memcmp(buff,(char*)pFw,16))
 	{
-		MessageBox(TEXT("Bios file is invalid!"),TEXT("Error"),MB_ICONERROR);
+		MessageBox(TEXT("无效的BIOS文件"),TEXT("错误"),MB_ICONERROR);
 		EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 		GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 		GetDlgItem(IDC_SNCHECK)->EnableWindow();
@@ -338,7 +338,7 @@ int CBiosDlg::UpdateBios(void)
 		CloseHandle(pi.hProcess);
 		if (retDet)
 		{
-			_tcscpy(szErrMsg,TEXT("Did not support current platform!"));
+			_tcscpy(szErrMsg,TEXT("不支持当前平台！"));
 			goto end;
 		}
 		dwLen=GetFileSize(hReadPipe,NULL);
@@ -359,7 +359,7 @@ int CBiosDlg::UpdateBios(void)
 	}
 	if (m_nBiosSize != nActualBiosSize)
 	{
-		wsprintf(szErrMsg,TEXT("Current bios rom layout did not match, old size=0x%X, new size=0x%X!"),nActualBiosSize,m_nBiosSize);
+		wsprintf(szErrMsg,TEXT("当前BIOS分区大小与机器里的不一致, 机器中的大小为：0x%X, 文件中的大小为：0x%X!"),nActualBiosSize,m_nBiosSize);
 		goto end;
 	}
 
@@ -398,7 +398,7 @@ int CBiosDlg::UpdateBios(void)
 				nLock = 1;
 			}
 		}
-		SetDlgItemText(IDC_STATUS,nLock?TEXT("TXE/ME is locked"):TEXT("TXE/ME is unlocked"));
+		SetDlgItemText(IDC_STATUS,nLock?TEXT("TXE/ME 已锁定"):TEXT("TXE/ME 未锁定"));
 		delete szRegion;
 	}
 	Sleep(2000);
@@ -413,11 +413,11 @@ int CBiosDlg::UpdateBios(void)
 		if (retCode1 != 0)
 		{
 			m_bExistKey = FALSE;
-			SetDlgItemText(IDC_STATUS,TEXT("Product key not found!"));
+			SetDlgItemText(IDC_STATUS,TEXT("未发现微软密钥"));
 		}
 		else
 		{
-			SetDlgItemText(IDC_STATUS,TEXT("Found product key, saving..."));
+			SetDlgItemText(IDC_STATUS,TEXT("发现微软密钥，保存中......"));
 			dwLen=GetFileSize(hReadPipe,NULL);
 			char *buff=new char [dwLen+1];
 			char dpk[30]={0};
@@ -444,7 +444,7 @@ int CBiosDlg::UpdateBios(void)
 
 	if (!fp1.Open(m_szPath,CFile::modeRead|CFile::typeBinary))
 	{
-		_tcscpy(szErrMsg,TEXT("Can't find the firmware, please check whether is exist!"));
+		_tcscpy(szErrMsg,TEXT("未发现BIOS文件，请确认其是否存在！"));
 		goto end;
 	}
 	fLen=(DWORD)fp1.GetLength();
@@ -454,7 +454,7 @@ int CBiosDlg::UpdateBios(void)
 	if (!fp2.Open(TEXT("fw.bin"),CFile::modeCreate|CFile::modeReadWrite))
 	{
 		delete fBuff;
-		_tcscpy(szErrMsg,TEXT("Open firmware file failed!"));
+		_tcscpy(szErrMsg,TEXT("打开BIOS文件失败！"));
 		goto end;
 	}
 	fp2.Write(fBuff,fLen);
@@ -469,7 +469,8 @@ int CBiosDlg::UpdateBios(void)
 	{
 		cmd="cmd.exe /c fptw.exe -f fw.bin -bios";
 	}
-	SetDlgItemText(IDC_STATUS,TEXT("Programming flash"));
+	Sleep(2000);
+	SetDlgItemText(IDC_STATUS,TEXT("正在刷写BIOS......"));
 	sa.bInheritHandle=0;
 	si.wShowWindow=SW_SHOW;
 	retval=CreateProcessA(NULL,(LPSTR)(LPCSTR)cmd,&sa,&sa,0,0,NULL,NULL,&si,&pi);
@@ -480,13 +481,13 @@ int CBiosDlg::UpdateBios(void)
 	DeleteFile(TEXT("fw.bin"));
 	if (retCode1 == 0)
 	{
-		SetDlgItemText(IDC_STATUS,TEXT("Update successfully"));
+		SetDlgItemText(IDC_STATUS,TEXT("升级完成！"));
 		Sleep(1000);
 	}
 	else
 	{
-		SetDlgItemText(IDC_STATUS,TEXT("Update failed"));
-		_tcscpy(szErrMsg,TEXT("update BIOS firmware failed!"));
+		SetDlgItemText(IDC_STATUS,TEXT("升级失败！"));
+		_tcscpy(szErrMsg,TEXT("BIOS升级失败！"));
 		goto end;
 	}
 
@@ -495,6 +496,8 @@ int CBiosDlg::UpdateBios(void)
 	{
 		if (m_strSSN.GetLength())
 		{
+			Sleep(2000);
+			SetDlgItemText(IDC_STATUS,TEXT("正在刷写保留的序列号......"));
 			CBiosInfo* pInfo = ((CHWToolDlg*)GetParent())->m_BiosInfo;
 			strcpy(buff,"cmd.exe /c amidewin.exe /ss \"");
 			strcat(buff,pInfo->m_BiosInfoA.m_szSS);
@@ -511,6 +514,8 @@ int CBiosDlg::UpdateBios(void)
 		if (fp.Open(TEXT("key.bin"),CFile::modeRead))
 		{
 			fp.Close();
+			Sleep(2000);
+			SetDlgItemText(IDC_STATUS,TEXT("正在重新写入机器中的微软密钥......"));
 			CreateProcessA(NULL,"cmd.exe /c afuwin.exe /oad",&sa,&sa,0,0,NULL,NULL,&si,&pi);
 			WaitForSingleObject(pi.hThread,INFINITE);
 			CloseHandle(pi.hThread);
@@ -522,11 +527,11 @@ int CBiosDlg::UpdateBios(void)
 			CloseHandle(pi.hProcess);
 			if (retCode2 == 0)
 			{
-				SetDlgItemText(IDC_STATUS,TEXT("Write product key successfully"));
+				SetDlgItemText(IDC_STATUS,TEXT("刷KEY成功！"));
 			}
 			else
 			{
-				SetDlgItemText(IDC_STATUS,TEXT("Write product key failed"));
+				SetDlgItemText(IDC_STATUS,TEXT("刷KEY失败！"));
 			}
 			DeleteFile(TEXT("key.bin"));
 		}
@@ -567,7 +572,7 @@ end:
 	}
 	else
 	{
-		MessageBox(szErrMsg,TEXT("Update Error"),MB_ICONERROR);
+		MessageBox(szErrMsg,TEXT("升级错误"),MB_ICONERROR);
 	}
 
 	return 0;

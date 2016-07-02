@@ -43,7 +43,7 @@ void CSnDlg::OnPaint()
 	CRect m_rDataBox(40,160,420,180);
 	CFont m_LogoFont;
 	CString sLogoString = m_wszCpuInfo;
-	sLogoString += m_bIsx64 ? TEXT(" | 64bits") : TEXT(" | 32bits");
+	sLogoString += m_bIsx64 ? TEXT(" - 64bits") : TEXT(" - 32bits");
   	m_LogoFont.CreateFont(18, 0, 0, 0, FW_BOLD, 1, FALSE, FALSE,
 	  ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 	  FIXED_PITCH | FF_ROMAN, TEXT("Times New Roman"));

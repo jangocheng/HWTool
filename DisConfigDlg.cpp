@@ -407,88 +407,61 @@ int CDisConfigDlg::BuildParameter()
 		pBox->AddString(cfg.Name);
 	}
 	//business
-	if (wcslen(m_pCfg->business))
+	count = pBox->GetCount();
+	pBox->SetCurSel(0);
+	for (int i=0;i<count;i++)
 	{
-		count = pBox->GetCount();
-		pBox->SetCurSel(-1);
-		for (int i=0;i<count;i++)
+		pBox->GetLBText(i,lbText);
+		if (lbText.Compare(m_pCfg->business) == 0)
 		{
-			pBox->GetLBText(i,lbText);
-			if (lbText.Compare(m_pCfg->business) == 0)
-			{
-				pBox->SetCurSel(i);
-				break;
-			}
+			pBox->SetCurSel(i);
+			break;
 		}
-	}
-	else
-	{
-		pBox->SetCurSel(0);
 	}
 	//form factor class
-	if (wcslen(m_pCfg->maintype))
+	count = pBoxType->GetCount();
+	pBoxType->SetCurSel(0);
+	for (int i=0;i<count;i++)
 	{
-		count = pBoxType->GetCount();
-		pBoxType->SetCurSel(-1);
-		for (int i=0;i<count;i++)
+		pBoxType->GetLBText(i,lbText);
+		if (lbText.Compare(m_pCfg->maintype) == 0)
 		{
-			pBoxType->GetLBText(i,lbText);
-			if (lbText.Compare(m_pCfg->maintype) == 0)
-			{
-				pBoxType->SetCurSel(i);
-				break;
-			}
+			pBoxType->SetCurSel(i);
+			break;
 		}
-	}
-	else
-	{
-		pBoxType->SetCurSel(0);
 	}
 	//form factor subclass
 	sel = pBoxType->GetCurSel();
-	if (wcslen(m_pCfg->subtype) && sel != -1)
+
+	for (int i=0;i<3;i++)
 	{
-		for (int i=0;i<3;i++)
+		if (wcslen(subTypes[sel][i]))
 		{
-			if (wcslen(subTypes[sel][i]))
-			{
-				pBoxSubType->AddString(subTypes[sel][i]);
-			}
-		}
-		count = pBoxSubType->GetCount();
-		pBoxSubType->SetCurSel(-1);
-		for (int i=0;i<count;i++)
-		{
-			pBoxSubType->GetLBText(i,lbText);
-			if (lbText.Compare(m_pCfg->subtype) == 0)
-			{
-				pBoxSubType->SetCurSel(i);
-				break;
-			}
+			pBoxSubType->AddString(subTypes[sel][i]);
 		}
 	}
-	else
+	count = pBoxSubType->GetCount();
+	pBoxSubType->SetCurSel(0);
+	for (int i=0;i<count;i++)
 	{
-		pBoxSubType->SetCurSel(-1);
+		pBoxSubType->GetLBText(i,lbText);
+		if (lbText.Compare(m_pCfg->subtype) == 0)
+		{
+			pBoxSubType->SetCurSel(i);
+			break;
+		}
 	}
 	//touch
-	if (wcslen(m_pCfg->hastouch))
+	count = pBoxTouch->GetCount();
+	pBoxTouch->SetCurSel(0);
+	for (int i=0;i<count;i++)
 	{
-		count = pBoxTouch->GetCount();
-		pBoxTouch->SetCurSel(-1);
-		for (int i=0;i<count;i++)
+		pBoxTouch->GetLBText(i,lbText);
+		if (lbText.Compare(m_pCfg->hastouch) == 0)
 		{
-			pBoxTouch->GetLBText(i,lbText);
-			if (lbText.Compare(m_pCfg->hastouch) == 0)
-			{
-				pBoxTouch->SetCurSel(i);
-				break;
-			}
+			pBoxTouch->SetCurSel(i);
+			break;
 		}
-	}
-	else
-	{
-		pBoxTouch->SetCurSel(0);
 	}
 
 	SetDlgItemText(IDC_MODEL,m_pCfg->sku);
@@ -496,6 +469,7 @@ int CDisConfigDlg::BuildParameter()
 	m_nIndex = m_pCfg->idx;
 	UpdateData(FALSE);
 	sel = pBox->GetCurSel();
+	pBox->GetLBText(sel,lbText);
 	if (sel != -1)//business selection is valid
 	{
 		switch (m_pCfg->idx)
@@ -505,12 +479,13 @@ int CDisConfigDlg::BuildParameter()
 			while (pos)
 			{
 				paraIndex = m_ParaLicList.GetNext(pos);
-				if (wcscmp(paraIndex.Name,m_pCfg->business) == 0 && wcslen(paraIndex.Parameter))
+				if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
 				{
 					pSelBox->AddString(paraIndex.Parameter);
 				}
 			}
 			count = pSelBox->GetCount();
+			pSelBox->SetCurSel(0);
 			for (int i=0;i<count;i++)
 			{
 				pSelBox->GetLBText(i,lbText);
@@ -526,12 +501,13 @@ int CDisConfigDlg::BuildParameter()
 			while (pos)
 			{
 				paraIndex = m_ParaOemPOList.GetNext(pos);
-				if (wcscmp(paraIndex.Name,m_pCfg->business) == 0 && wcslen(paraIndex.Parameter))
+				if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
 				{
 					pSelBox->AddString(paraIndex.Parameter);
 				}
 			}
 			count = pSelBox->GetCount();
+			pSelBox->SetCurSel(0);
 			for (int i=0;i<count;i++)
 			{
 				pSelBox->GetLBText(i,lbText);
@@ -547,12 +523,13 @@ int CDisConfigDlg::BuildParameter()
 			while (pos)
 			{
 				paraIndex = m_ParaOemPartList.GetNext(pos);
-				if (wcscmp(paraIndex.Name,m_pCfg->business) == 0 && wcslen(paraIndex.Parameter))
+				if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
 				{
 					pSelBox->AddString(paraIndex.Parameter);
 				}
 			}
 			count = pSelBox->GetCount();
+			pSelBox->SetCurSel(0);
 			for (int i=0;i<count;i++)
 			{
 				pSelBox->GetLBText(i,lbText);
