@@ -247,8 +247,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 10,1,10586,1
+ PRODUCTVERSION 10,1,10586,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -265,14 +265,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
             VALUE "FileDescription", "Authorized by Kelvin Cheng"
-            VALUE "FileVersion", "1.0"
+            VALUE "FileVersion", "10, 1, 10586, 1"
             VALUE "InternalName", "HWTool.exe"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "LegalTrademarks", "Techvision"
             VALUE "OriginalFilename", "HWTool.exe"
             VALUE "ProductName", "HWTool Application"
-            VALUE "ProductVersion", "1.0"
-            VALUE "SpecialBuild", "1.0.10586.0"
+            VALUE "ProductVersion", "10.1.10586.1"
+            VALUE "SpecialBuild", "10.1.10586.1"
         END
     END
     BLOCK "VarFileInfo"

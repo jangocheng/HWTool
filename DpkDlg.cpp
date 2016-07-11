@@ -107,8 +107,7 @@ BOOL CDpkDlg::OnInitDialog()
 	CCpuInfo ci;
 	mbstowcs(m_wszCpuInfo,ci.GetBrand(),49);
 	IsWow64Process(GetCurrentProcess(),&m_bIsx64);
-	CHWToolDlg* pParent = (CHWToolDlg*)GetParent();
-	CBiosInfo* pInfo = pParent->m_BiosInfo;
+	CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
 	SetDlgItemText(IDC_IBV,pInfo->m_BiosInfoW.m_wszIVN);
 	SetDlgItemText(IDC_BIOSVER,pInfo->m_BiosInfoW.m_wszIV);
 	SetDlgItemText(IDC_BIOSDATE,pInfo->m_BiosInfoW.m_wszID);

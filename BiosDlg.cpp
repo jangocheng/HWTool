@@ -274,8 +274,7 @@ BOOL CBiosDlg::OnInitDialog()
 	CCpuInfo ci;
 	mbstowcs(m_wszCpuInfo,ci.GetBrand(),49);
 	IsWow64Process(GetCurrentProcess(),&m_bIsx64);
-	CHWToolDlg* pParent = (CHWToolDlg*)GetParent();
-	CBiosInfo* pInfo = pParent->m_BiosInfo;
+	CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
 	SetDlgItemText(IDC_IBV,pInfo->m_BiosInfoW.m_wszIVN);
 	SetDlgItemText(IDC_BIOSVER,pInfo->m_BiosInfoW.m_wszIV);
 	SetDlgItemText(IDC_BIOSDATE,pInfo->m_BiosInfoW.m_wszID);
@@ -492,13 +491,31 @@ int CBiosDlg::UpdateBios(void)
 	}
 
 	si.wShowWindow=SW_HIDE;
+	if (1)
+	{
+		CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
+		if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
+		{
+			strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
+			GUID guid;
+			CoCreateGuid(&guid);
+			memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
+			sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+			strcat(buff,pInfo->m_BiosInfoA.m_szSU);
+			strcat(buff,"\"");
+			retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
+			WaitForSingleObject(pi.hThread,INFINITE);
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+		}
+	}
 	if (m_nSN == BST_CHECKED)
 	{
 		if (m_strSSN.GetLength())
 		{
 			Sleep(2000);
 			SetDlgItemText(IDC_STATUS,TEXT("正在刷写保留的序列号......"));
-			CBiosInfo* pInfo = ((CHWToolDlg*)GetParent())->m_BiosInfo;
+			CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
 			strcpy(buff,"cmd.exe /c amidewin.exe /ss \"");
 			strcat(buff,pInfo->m_BiosInfoA.m_szSS);
 			strcat(buff,"\"");

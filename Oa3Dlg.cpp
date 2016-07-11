@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "HWTool.h"
 #include "Oa3Dlg.h"
+#include "HWToolDlg.h"
 
 
 // COa3Dlg dialog
@@ -634,6 +635,25 @@ void COa3Dlg::ProcessKeyInjection()
 		}
 		//----------------------------------------------------------------------
 #if 1
+		if (1)
+		{
+			char buff[256] = {0};
+			CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
+			if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
+			{
+				strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
+				GUID guid;
+				CoCreateGuid(&guid);
+				memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
+				sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+				strcat(buff,pInfo->m_BiosInfoA.m_szSU);
+				strcat(buff,"\"");
+				retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
+				WaitForSingleObject(pi.hThread,INFINITE);
+				CloseHandle(pi.hThread);
+				CloseHandle(pi.hProcess);
+			}
+		}
 		retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /bs",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
 		if(retval)
 		{
@@ -871,7 +891,7 @@ void COa3Dlg::EraseKey()
 		if (IDYES == MessageBox(TEXT("确定要擦除此设备中的KEY吗？"),TEXT("警告"),MB_YESNO|MB_ICONWARNING))
 		{
 			SetDlgItemText(IDC_STATUS,TEXT("正在删除KEY码......"));
-			CreateProcessA(NULL,"cmd.exe /c OATool.exe -e",0,0,0,0,NULL,NULL,&si,&pi);
+			CreateProcessA(NULL,"cmd.exe /c afuwin.exe /oad",0,0,0,0,NULL,NULL,&si,&pi);
 			WaitForSingleObject(pi.hThread,INFINITE);
 			GetExitCodeProcess(pi.hProcess,&retCode);
 			if (retCode == 0)
