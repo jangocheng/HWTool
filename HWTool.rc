@@ -150,8 +150,8 @@ IDD_SN DIALOGEX 0, 0, 332, 198
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    EDITTEXT        IDC_FW,76,131,193,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "更新",IDC_UPDATE,138,159,54,17
+    EDITTEXT        IDC_FW,76,141,193,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "更新",IDC_UPDATE,138,165,54,17
     GROUPBOX        "BIOS信息",IDC_STATIC,2,0,327,94
     RTEXT           "BIOS供应商：",IDC_STATIC,5,19,49,8
     CONTROL         "",IDC_STATIC,"Static",SS_GRAYFRAME,165,4,1,89,WS_EX_STATICEDGE
@@ -170,7 +170,9 @@ BEGIN
     LTEXT           "",IDC_MODEL,221,37,100,8
     LTEXT           "",IDC_SERIALNUM,221,55,100,8
     LTEXT           "",IDC_MBPID,221,73,100,8
-    RTEXT           "序列号：",IDC_STATIC,38,133,33,8
+    RTEXT           "序列号：",IDC_STATIC,38,143,33,8
+    EDITTEXT        IDC_UUID,76,121,193,12,ES_AUTOHSCROLL | ES_READONLY
+    RTEXT           "UUID：",IDC_STATIC,45,123,26,8
 END
 
 IDD_OADLG DIALOGEX 0, 0, 332, 198
@@ -247,8 +249,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,1,10586,1
- PRODUCTVERSION 10,1,10586,1
+ FILEVERSION 10,1,10586,2
+ PRODUCTVERSION 10,1,10586,2
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x21L
@@ -265,14 +267,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
             VALUE "FileDescription", "Authorized by Kelvin Cheng"
-            VALUE "FileVersion", "10, 1, 10586, 1"
+            VALUE "FileVersion", "10, 1, 10586, 2"
             VALUE "InternalName", "HWTool.exe"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "LegalTrademarks", "Techvision"
             VALUE "OriginalFilename", "HWTool.exe"
             VALUE "ProductName", "HWTool Application"
-            VALUE "ProductVersion", "10.1.10586.1"
-            VALUE "SpecialBuild", "10.1.10586.1"
+            VALUE "ProductVersion", "10.1.10586.2"
+            VALUE "SpecialBuild", "10.1.10586.2"
         END
     END
     BLOCK "VarFileInfo"

@@ -247,7 +247,7 @@ CHWToolApp::CHWToolApp()
 	// TODO: add construction code here,
 	// Place all significant initialization in InitInstance
 	m_hMutex = NULL;
-	m_BiosInfo = new CBiosInfo();
+	m_BiosInfo = NULL;
 }
 
 
@@ -307,6 +307,7 @@ BOOL CHWToolApp::InitInstance()
 	CoInitialize(NULL);
 
 	CHWToolDlg dlg;
+	m_BiosInfo = new CBiosInfo();
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
@@ -333,6 +334,6 @@ int CHWToolApp::ExitInstance()
 	if(m_hMutex)
 		CloseHandle(m_hMutex);
 	m_hMutex=NULL;
-	delete m_BiosInfo;
+	if (m_BiosInfo) delete m_BiosInfo;
 	return CWinApp::ExitInstance();
 }

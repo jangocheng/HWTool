@@ -46,6 +46,7 @@
 #define IDC_TOUCH                       1010
 #define IDC_FW                          1011
 #define IDC_BROWSE                      1012
+#define IDC_UUID                        1012
 #define IDC_UPDATE                      1013
 #define IDC_STATUS                      1014
 #define IDC_SNCHECK                     1015
