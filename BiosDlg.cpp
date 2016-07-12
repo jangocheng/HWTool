@@ -494,15 +494,19 @@ int CBiosDlg::UpdateBios(void)
 	if (1)
 	{
 		CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
+		strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
 		if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
 		{
-			strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
 			GUID guid;
 			CoCreateGuid(&guid);
 			memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
 			sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
 			mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
-			((CHWToolDlg*)GetParent())->m_pDlg[1]->SetDlgItemText(IDC_SERIALNUM,pInfo->m_BiosInfoW.m_wszSU);
+			((CHWToolDlg*)GetParent())->m_pDlg[1]->SetDlgItemText(IDC_UUID,pInfo->m_BiosInfoW.m_wszSU);
+		}
+
+		if (strlen(pInfo->m_BiosInfoA.m_szSU))
+		{
 			strcat(buff,pInfo->m_BiosInfoA.m_szSU);
 			strcat(buff,"\"");
 			retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
