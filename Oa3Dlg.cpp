@@ -514,6 +514,7 @@ void COa3Dlg::ProcessKeyInjection()
 	SECURITY_ATTRIBUTES sa={0};
 	struct sockaddr_in  addr;//这是网络地址数据结构,服务端地址 
 	struct timeval timeout={10,0};//3s
+	CHWToolDlg* pParent = (CHWToolDlg*)((CHWToolApp*)AfxGetApp())->m_pMainWnd;
 
 	sa.bInheritHandle=1;
 	sa.nLength=sizeof SECURITY_ATTRIBUTES;
@@ -647,7 +648,7 @@ void COa3Dlg::ProcessKeyInjection()
 				memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
 				sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
 				mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
-				((CHWToolDlg*)GetParent())->m_pDlg[1]->SetDlgItemText(IDC_SERIALNUM,pInfo->m_BiosInfoW.m_wszSU);
+				pParent->m_pDlg[1]->SetDlgItemText(IDC_UUID,pInfo->m_BiosInfoW.m_wszSU);
 				strcat(buff,pInfo->m_BiosInfoA.m_szSU);
 				strcat(buff,"\"");
 				retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);

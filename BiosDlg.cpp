@@ -104,6 +104,7 @@ void CBiosDlg::OnBnClickedUpdate()
 	GUID CHT3  = { 0x0ff0a55a, 0x0003, 0x0204, { 0x06, 0x02, 0x10, 0x0e, 0x20, 0x00, 0x21, 0x00 } };
 	GUID* pFw=NULL;
 
+	CHWToolDlg* pParent = (CHWToolDlg*)((CHWToolApp*)AfxGetApp())->m_pMainWnd;
 	m_nType = -1;
 	char buff[16]={0};
 	if (wcsstr(m_wszCpuInfo,L"Z83") || 
@@ -314,6 +315,7 @@ int CBiosDlg::UpdateBios(void)
 	CBytTool* t1=0;
 	CChtTool86* t2=0;
 	CChtTool64* t3=0;
+	CHWToolDlg* pParent = (CHWToolDlg*)((CHWToolApp*)AfxGetApp())->m_pMainWnd;
 	if (m_nType == 1)
 	{
 		t2 = new CChtTool86();
@@ -502,7 +504,7 @@ int CBiosDlg::UpdateBios(void)
 			memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
 			sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
 			mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
-			((CHWToolDlg*)GetParent())->m_pDlg[1]->SetDlgItemText(IDC_UUID,pInfo->m_BiosInfoW.m_wszSU);
+			pParent->m_pDlg[1]->SetDlgItemText(IDC_UUID,pInfo->m_BiosInfoW.m_wszSU);
 		}
 
 		if (strlen(pInfo->m_BiosInfoA.m_szSU))

@@ -85,6 +85,7 @@ void CSnDlg::OnBnClickedUpdate()
 	PROCESS_INFORMATION pi={0};
 	STARTUPINFOA si={0};
 	SECURITY_ATTRIBUTES sa={0};
+	CHWToolDlg* pParent = (CHWToolDlg*)((CHWToolApp*)AfxGetApp())->m_pMainWnd;
 	si.cb=sizeof STARTUPINFOA;
 	si.wShowWindow=SW_HIDE;
 	si.dwFlags=STARTF_USESHOWWINDOW;
@@ -123,7 +124,7 @@ void CSnDlg::OnBnClickedUpdate()
 			memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
 			sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
 			mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
-			((CHWToolDlg*)GetParent())->m_pDlg[1]->SetDlgItemText(IDC_SERIALNUM,pInfo->m_BiosInfoW.m_wszSU);
+			pParent->m_pDlg[1]->SetDlgItemText(IDC_UUID,pInfo->m_BiosInfoW.m_wszSU);
 			strcat(buff,pInfo->m_BiosInfoA.m_szSU);
 			strcat(buff,"\"");
 			retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
@@ -133,7 +134,6 @@ void CSnDlg::OnBnClickedUpdate()
 		}
 	}
 	Sleep(500);
-	CHWToolDlg* pParent = (CHWToolDlg*)GetParent();
 	CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
 	pInfo->RebuildInfo();
 	SetDlgItemText(IDC_IBV,pInfo->m_BiosInfoW.m_wszIVN);
