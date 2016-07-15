@@ -351,7 +351,7 @@ CChtTool64::~CChtTool64()
 CHWToolDlg::CHWToolDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CHWToolDlg::IDD, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_OA);
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_AmiTool = new CAmiTool();
 }
 
@@ -412,7 +412,7 @@ BOOL CHWToolDlg::OnInitDialog()
 		m_pDlg[i]->SetWindowPos(NULL,0,rc.bottom,0,0,SWP_NOSIZE);
 	}
 	int sel = m_pTab->GetCurSel();
-	m_pDlg[3]->ShowWindow(SW_SHOW);
+	m_pDlg[sel]->ShowWindow(SW_SHOW);
 	//DWORD dwWidth,dwHeight;
 	//XDD_GetActiveMonitorPhysicalSize(dwWidth,dwHeight);
     //int nScreenWidth, nScreenHeight; 
