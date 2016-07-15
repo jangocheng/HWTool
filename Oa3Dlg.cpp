@@ -927,3 +927,17 @@ UINT COa3Dlg::KeyEraseThread(LPVOID lpv)
 	p->EraseKey();
 	return 0;
 }
+
+void COa3Dlg::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnCancel();
+}
+
+void COa3Dlg::OnOK()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnOK();
+}

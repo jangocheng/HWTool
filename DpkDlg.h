@@ -34,4 +34,7 @@ public:
 	void WriteProductKey();
 	static UINT GetKeyThread(LPVOID lp);
 	static UINT PutKeyThread(LPVOID lp);
+protected:
+	virtual void OnCancel();
+	virtual void OnOK();
 };

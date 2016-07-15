@@ -33,4 +33,7 @@ public:
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	virtual BOOL OnInitDialog();
 	int UpdateBios(void);
+protected:
+	virtual void OnCancel();
+	virtual void OnOK();
 };
