@@ -8,7 +8,7 @@
 #define IDD_DPK                         105
 #define IDD_SN                          106
 #define IDD_OADLG                       107
-#define IDR_MAINFRAME                   128
+#define IDR_MAINFRAME                   156
 #define IDR_AFUWIN                      129
 #define IDR_AMIDEWIN                    130
 #define IDR_AMIFLDRV32                  131
@@ -31,7 +31,7 @@
 #define IDR_OACFG                       152
 #define IDR_OATOOL                      153
 #define IDD_CFG                         154
-#define IDR_OA                          156
+#define IDR_OA                          128
 #define IDD_WAITDLG                     157
 #define IDC_TAB1                        1000
 #define IDC_IBV                         1003

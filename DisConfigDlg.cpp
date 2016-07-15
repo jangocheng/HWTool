@@ -217,7 +217,7 @@ int CDisConfigDlg::BuildConfiguration(void)
 	//SELECT  LicensablePartNumber  FROM ProductKeyInfo group by LicensablePartNumber
 	POSITION pos;
 	CString connectionstr;
-	connectionstr.Format(TEXT("Provider=SQLOLEDB.1;Data Source=%s;Initial Catalog=DISConfigurationCloud;User ID=sa;Password=%s"),m_pCfg->ip,m_pCfg->password);
+	connectionstr.Format(TEXT("Provider=SQLOLEDB.1;Data Source=%s;Initial Catalog=DISConfigurationDB;User ID=sa;Password=%s"),m_pCfg->ip,m_pCfg->password);
 	try
 	{
 		if (m_pConn->GetState() & adStateOpen) 
@@ -229,9 +229,9 @@ int CDisConfigDlg::BuildConfiguration(void)
 		{
 			m_pRds->Close();
 		}
-		m_pRds->Open(TEXT("SELECT A.Name, B.Id, B.DbConnectionString from Customers A inner join Configurations B on A.Id = B.CustomerId and B.TypeId = 2"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+		m_pRds->Open(TEXT("SELECT BusinessName, BusinessID, DatabaseName FROM Business WHERE Status=1"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
 		//get records
-		wchar_t buff[128] = {0},*tmp;
+		wchar_t buff[128] = {0};
 		while (!m_pRds->adoEOF)
 		{
 			Configuration cfg = {0};
@@ -254,15 +254,7 @@ int CDisConfigDlg::BuildConfiguration(void)
 			if(var.vt!=VT_NULL)
 			{
 				wcscpy(buff,var.bstrVal);
-				wcscpy(cfg.DbConnectionString,TEXT("Provider=SQLOLEDB.1;Data Source="));
-				wcscat(cfg.DbConnectionString,m_pCfg->ip);
-				wcscat(cfg.DbConnectionString,TEXT(";"));
-				tmp = wcsstr(buff,TEXT("Initial Catalog"));
-				if (!tmp)
-				{
-					goto err;
-				}
-				wcscat(cfg.DbConnectionString,tmp);
+				wsprintf(cfg.DbConnectionString,TEXT("Provider=SQLOLEDB.1;Data Source=%s;Initial Catalog=%s;User ID=sa;Password=%s"),m_pCfg->ip,buff,m_pCfg->password);
 			}
 			m_ConfigurationList.AddTail(cfg);
 			m_pRds->MoveNext();
