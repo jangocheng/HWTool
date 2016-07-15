@@ -602,3 +602,17 @@ end:
 
 	return 0;
 }
+
+void CBiosDlg::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnCancel();
+}
+
+void CBiosDlg::OnOK()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnOK();
+}

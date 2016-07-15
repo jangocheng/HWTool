@@ -18,4 +18,6 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+	virtual void OnCancel();
+	virtual void OnOK();
 };

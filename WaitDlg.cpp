@@ -31,3 +31,17 @@ END_MESSAGE_MAP()
 
 
 // CWaitDlg message handlers
+
+void CWaitDlg::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnCancel();
+}
+
+void CWaitDlg::OnOK()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnOK();
+}

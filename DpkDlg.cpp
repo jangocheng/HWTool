@@ -359,3 +359,16 @@ UINT CDpkDlg::PutKeyThread(LPVOID lp)
 	EnableMenuItem(::GetSystemMenu(p->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 	return 0L;
 }
+void CDpkDlg::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnCancel();
+}
+
+void CDpkDlg::OnOK()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnOK();
+}

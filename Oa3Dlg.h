@@ -78,4 +78,7 @@ public:
 	afx_msg void OnDestroy();
 	afx_msg void OnBnClickedInject();
 	afx_msg void OnBnClickedErase();
+protected:
+	virtual void OnCancel();
+	virtual void OnOK();
 };

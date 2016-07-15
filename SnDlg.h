@@ -25,4 +25,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnBnClickedUpdate();
 	virtual BOOL OnInitDialog();
+protected:
+	virtual void OnCancel();
+	virtual void OnOK();
 };

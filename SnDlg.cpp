@@ -179,3 +179,17 @@ BOOL CSnDlg::OnInitDialog()
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
+
+void CSnDlg::OnCancel()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnCancel();
+}
+
+void CSnDlg::OnOK()
+{
+	// TODO: Add your specialized code here and/or call the base class
+
+	//CDialog::OnOK();
+}
