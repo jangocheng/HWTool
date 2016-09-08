@@ -396,7 +396,9 @@ BOOL CHWToolDlg::OnInitDialog()
 	m_pTab->InsertItem(0,TEXT("BIOS工具"),0);
 	m_pTab->InsertItem(1,TEXT("序列号刷写"),1);
 	m_pTab->InsertItem(2,TEXT("微软密钥"),2);
-	//m_pTab->InsertItem(3,TEXT("刷Key工具"),3);
+#ifdef __FULL_FUN__
+	m_pTab->InsertItem(3,TEXT("刷Key工具"),3);
+#endif
 	m_pTab->GetClientRect(&rc);
 
 	m_BiosDlg.Create(IDD_BIOS,this);
@@ -406,8 +408,12 @@ BOOL CHWToolDlg::OnInitDialog()
 	m_pDlg[0]=&m_BiosDlg;
 	m_pDlg[1]=&m_SnDlg;
 	m_pDlg[2]=&m_DpkDlg;
-	//m_pDlg[3]=&m_OaDlg;
-	for (int i=0; i< 3; i++)
+#ifdef __FULL_FUN__
+	m_pDlg[3]=&m_OaDlg;
+	for (int i=0; i< 4; i++)
+#else
+	for (int i=0; i<3; i++)
+#endif
 	{
 		m_pDlg[i]->SetWindowPos(NULL,0,rc.bottom,0,0,SWP_NOSIZE);
 	}
@@ -465,7 +471,11 @@ void CHWToolDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
 	// TODO: Add your control notification handler code here
 	*pResult = 0;
 	int sel = m_pTab->GetCurSel();
+#ifdef __FULL_FUN__
+	for (int i=0; i< 4; i++)
+#else
 	for (int i=0; i< 3; i++)
+#endif
 	{
 		m_pDlg[i]->ShowWindow(SW_HIDE);
 	}

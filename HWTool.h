@@ -9,6 +9,7 @@
 
 #include "resource.h"		// main symbols
 
+//#define __FULL_FUN__
 
 // CHWToolApp:
 // See HWTool.cpp for the implementation of this class
