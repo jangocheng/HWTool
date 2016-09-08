@@ -1,6 +1,6 @@
 #pragma once
 #include "DisConfigDlg.h"
-//#define __MAC
+#define __MAC
 #ifdef __MAC
 #define _WIN32_DCOM
 #include <comdef.h>

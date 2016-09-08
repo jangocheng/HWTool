@@ -282,7 +282,7 @@ BOOL CHWToolApp::InitInstance()
 	m_hMutex=OpenMutex(MUTEX_ALL_ACCESS,FALSE,TEXT("HUIWEITool"));
 	if(m_hMutex)
 	{
-		HWND hWnd=FindWindow(NULL,TEXT("HUIWEITool - OA3.0"));
+		HWND hWnd=FindWindow(NULL,TEXT("HuiWeiTool - OA3.0(Ver:06)"));
 		if (hWnd)
 		{
 			if(!IsWindowVisible(hWnd))

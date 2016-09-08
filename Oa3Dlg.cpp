@@ -709,19 +709,6 @@ void COa3Dlg::ProcessKeyInjection()
 			delete buf;
 		}
 #endif
-		//----------------------------------------------------------------------
-
-		len=sizeof(KeyInfo) - 4;
-		m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
-		cnt = 1, cnt2 = 10;
-		len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
-		Sleep(500);
-		len = recv(m_socket,szTmp,1024,0);
-		if (strncmp(szTmp,"techvision",len))
-		{
-			MessageBox(TEXT("上传CBR失败！"),TEXT("错误"),MB_ICONERROR);
-			goto __end;
-		}
 
 		SetDlgItemText(IDC_STATUS,TEXT("正在对比CBR，请稍候......"));
 
@@ -751,6 +738,18 @@ void COa3Dlg::ProcessKeyInjection()
 				{
 					SetDlgItemTextA(m_hWnd,IDC_PKID,m_KeyInfo.PKID);
 					SetDlgItemText(IDC_STATUS,TEXT("CBR上传成功......"));
+					//----------------------------------------------------------------------
+					len=sizeof(KeyInfo) - 4;
+					m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
+					cnt = 1, cnt2 = 10;
+					len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
+					Sleep(500);
+					len = recv(m_socket,szTmp,1024,0);
+					if (strncmp(szTmp,"techvision",len))
+					{
+						MessageBox(TEXT("上传收集数据失败！"),TEXT("错误"),MB_ICONERROR);
+						goto __end;
+					}
 				}
 				else
 				{
@@ -795,6 +794,102 @@ void COa3Dlg::ProcessKeyInjection()
 			{
 				SetDlgItemTextA(m_hWnd,IDC_PKID,m_pkInfo.pkid);
 				SetDlgItemText(IDC_STATUS,TEXT("CBR上传成功......"));
+
+				//----------------------------------------------------------------------
+#if 1
+				if (1)
+				{
+					char buff[256] = {0};
+					CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
+					if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
+					{
+						strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
+						GUID guid;
+						CoCreateGuid(&guid);
+						memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
+						sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+						mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
+						pParent->m_pDlg[1]->SetDlgItemText(IDC_UUID,pInfo->m_BiosInfoW.m_wszSU);
+						strcat(buff,pInfo->m_BiosInfoA.m_szSU);
+						strcat(buff,"\"");
+						retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
+						WaitForSingleObject(pi.hThread,INFINITE);
+						CloseHandle(pi.hThread);
+						CloseHandle(pi.hProcess);
+					}
+				}
+				retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /bs",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
+				if(retval)
+				{
+					WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
+					CloseHandle(pi.hThread);
+					CloseHandle(pi.hProcess);
+					dwLen=GetFileSize(hReadPipe,NULL);
+					char *buf=new char[dwLen+1];
+					retval=ReadFile(hReadPipe,buf,dwLen,&dwRead,NULL);
+					if (strlen(buf))
+					{
+						char* p1=strchr(buf,'"');
+						if (p1)
+						{
+							p1++;
+							char* p2=strchr(p1,'"');
+							if (p2)
+							{
+								*p2 = 0;
+								strcpy(m_KeyInfo.BSN,p1);
+							}
+						}
+					}
+					delete buf;
+				}
+				//----------------------------------------------------------------------
+				retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /ss",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
+				if(retval)
+				{
+					WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
+					CloseHandle(pi.hThread);
+					CloseHandle(pi.hProcess);
+					dwLen=GetFileSize(hReadPipe,NULL);
+					char *buf=new char[dwLen+1];
+					retval=ReadFile(hReadPipe,buf,dwLen,&dwRead,NULL);
+					if (strlen(buf))
+					{
+						char* p1=strchr(buf,'"');
+						if (p1)
+						{
+							p1++;
+							char* p2=strchr(p1,'"');
+							if (p2)
+							{
+								*p2 = 0;
+								strcpy(m_KeyInfo.SSN,p1);
+							}
+						}
+					}
+					delete buf;
+				}
+#endif
+				strcpy(m_KeyInfo.PKID,m_pkInfo.pkid);
+				strcpy(m_KeyInfo.KEY,m_pkInfo.key);
+#ifdef __MAC
+				GetDeviceAddress();
+				GetIMEI();
+#endif
+				//----------------------------------------------------------------------
+
+				len=sizeof(KeyInfo) - 4;
+				m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
+				cnt = 1, cnt2 = 10;
+				len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
+				Sleep(500);
+				len = recv(m_socket,szTmp,1024,0);
+				if (strncmp(szTmp,"techvision",len))
+				{
+					MessageBox(TEXT("上传CBR失败！"),TEXT("错误"),MB_ICONERROR);
+					goto __end;
+				}
+
 			}
 			else
 			{
