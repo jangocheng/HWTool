@@ -997,6 +997,11 @@ void COa3Dlg::EraseKey()
 				MessageBox(TEXT("KEY擦除成功，按确认后系统将重启！"),TEXT("提示"),MB_ICONINFORMATION);
 				Reboot();
 			}
+			else if (retCode == 0xb7)
+			{
+				MessageBox(TEXT("KEY已经擦除，按确认后系统将重启！"),TEXT("提示"),MB_ICONINFORMATION);
+				Reboot();
+			}
 			else
 			{
 				MessageBox(TEXT("KEY擦除失败，可能需要重刷一次BIOS"),TEXT("错误"),MB_ICONERROR);
