@@ -284,6 +284,7 @@ BOOL CBiosDlg::OnInitDialog()
 	SetDlgItemText(IDC_MODEL,pInfo->m_BiosInfoW.m_wszSP);
 	SetDlgItemText(IDC_SERIALNUM,pInfo->m_BiosInfoW.m_wszSS);
 	SetDlgItemText(IDC_MBPID,pInfo->m_BiosInfoW.m_wszBM);
+	((CButton*)GetDlgItem(IDC_SNCHECK))->SetCheck(1);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -496,11 +497,13 @@ int CBiosDlg::UpdateBios(void)
 	if (1)
 	{
 		CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
-		strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
+		//pInfo->RebuildInfo();
 		if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
 		{
 			GUID guid;
 			CoCreateGuid(&guid);
+			Sleep(1000);
+			SetDlgItemText(IDC_STATUS,TEXT("正在生成系统UUID......"));
 			memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
 			sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
 			mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
@@ -509,7 +512,12 @@ int CBiosDlg::UpdateBios(void)
 
 		if (strlen(pInfo->m_BiosInfoA.m_szSU))
 		{
-			strcat(buff,pInfo->m_BiosInfoA.m_szSU);
+			Sleep(1000);
+			SetDlgItemText(IDC_STATUS,pInfo->m_BiosInfoW.m_wszSU);
+			Sleep(1000);
+			SetDlgItemText(IDC_STATUS,TEXT("正在更新系统UUID......"));
+			strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
+			strncat(buff,pInfo->m_BiosInfoA.m_szSU,32);
 			strcat(buff,"\"");
 			retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
 			WaitForSingleObject(pi.hThread,INFINITE);
@@ -519,7 +527,7 @@ int CBiosDlg::UpdateBios(void)
 	}
 	if (m_nSN == BST_CHECKED)
 	{
-		if (m_strSSN.GetLength())
+		//if (m_strSSN.GetLength())
 		{
 			Sleep(2000);
 			SetDlgItemText(IDC_STATUS,TEXT("正在刷写保留的序列号......"));
@@ -587,6 +595,7 @@ end:
 		DeleteFile(TEXT("amifldrv32.sys"));
 		DeleteFile(TEXT("amifldrv64.sys"));
 		Sleep(1000);
+		SetDlgItemText(IDC_STATUS,TEXT("正在重启系统......"));
 		OpenProcessToken(GetCurrentProcess(),TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY,&hToken);
 		LookupPrivilegeValue(NULL,SE_SHUTDOWN_NAME,&tkp.Privileges[0].Luid);
 		tkp.PrivilegeCount = 1;

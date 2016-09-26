@@ -78,7 +78,7 @@ IDR_OA                  ICON                    "res\\oa.ico"
 IDD_HWTOOL_DIALOG DIALOGEX 0, 0, 332, 212
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST | WS_EX_APPWINDOW
-CAPTION "HuiWeiTool(Ver:06)"
+CAPTION "HuiWeiTool(Ver:07)"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,0,0,332,14
@@ -249,8 +249,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,1,10586,6
- PRODUCTVERSION 10,1,10586,6
+ FILEVERSION 10,1,10586,7
+ PRODUCTVERSION 10,1,10586,7
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -267,13 +267,13 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
             VALUE "FileDescription", "Authorized by Kelvin Cheng"
-            VALUE "FileVersion", "10, 1, 10586, 6"
+            VALUE "FileVersion", "10, 1, 10586, 7"
             VALUE "InternalName", "HWTool.exe"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "LegalTrademarks", "Techvision"
             VALUE "OriginalFilename", "HWTool.exe"
             VALUE "ProductName", "HWTool Application"
-            VALUE "ProductVersion", "10, 1, 10586, 6"
+            VALUE "ProductVersion", "10, 1, 10586, 7"
         END
     END
     BLOCK "VarFileInfo"
