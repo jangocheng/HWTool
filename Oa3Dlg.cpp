@@ -743,8 +743,15 @@ void COa3Dlg::ProcessKeyInjection()
 					m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
 					cnt = 1, cnt2 = 10;
 					len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
-					Sleep(500);
-					len = recv(m_socket,szTmp,1024,0);
+					while (cnt2-->0)
+					{
+						Sleep(1000);
+						len = recv(m_socket,szTmp,1024,0);
+						if (len > 0)
+						{
+							break;
+						}
+					}
 					if (strncmp(szTmp,"techvision",len))
 					{
 						MessageBox(TEXT("上传收集数据失败！"),TEXT("错误"),MB_ICONERROR);
@@ -882,8 +889,15 @@ void COa3Dlg::ProcessKeyInjection()
 				m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
 				cnt = 1, cnt2 = 10;
 				len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
-				Sleep(500);
-				len = recv(m_socket,szTmp,1024,0);
+				while (cnt2-->0)
+				{
+					Sleep(1000);
+					len = recv(m_socket,szTmp,1024,0);
+					if (len > 0)
+					{
+						break;
+					}
+				}
 				if (strncmp(szTmp,"techvision",len))
 				{
 					MessageBox(TEXT("上传CBR失败！"),TEXT("错误"),MB_ICONERROR);
