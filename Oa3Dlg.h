@@ -55,7 +55,9 @@ public:
 	BOOL GetProductKey();
 	DWORD CRC_Table[256];
 	TCHAR  m_szTempDir[MAX_PATH];
+#ifdef __N_HCD__
 	SOCKET m_socket;
+#endif
 	ProductKeyInfo m_pkInfo;
 	KeyInfo m_KeyInfo;
 

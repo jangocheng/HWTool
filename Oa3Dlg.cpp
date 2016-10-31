@@ -524,9 +524,9 @@ void COa3Dlg::ProcessKeyInjection()
 	si.wShowWindow=SW_HIDE;
 	si.dwFlags=STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;
 	si.hStdOutput=si.hStdError=hWritePipe;
-
+#ifdef __N_HCD__
 	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-
+#endif
 	SetCurrentDirectory(m_szTempDir);
 	if (fp.Open(TEXT("oa3tool.cfg"),CFile::modeRead))
 	{
@@ -550,6 +550,7 @@ void COa3Dlg::ProcessKeyInjection()
 		goto __end;
 	}
 
+#ifdef __N_HCD__
 	SetDlgItemText(IDC_STATUS,TEXT("正在连接服务器......"));
 
 	addr.sin_family = AF_INET; 
@@ -578,6 +579,8 @@ void COa3Dlg::ProcessKeyInjection()
 		MessageBox(TEXT("服务器授权失败，请确认软件版本是否正确"),TEXT("授权错误"),MB_ICONERROR);
 		goto __end;
 	}
+
+#endif
 
 	SetDlgItemText(IDC_STATUS,TEXT("正在查询机器的KEY......"));
 	bHasKey = GetProductKey();
@@ -739,6 +742,7 @@ void COa3Dlg::ProcessKeyInjection()
 					SetDlgItemTextA(m_hWnd,IDC_PKID,m_KeyInfo.PKID);
 					SetDlgItemText(IDC_STATUS,TEXT("CBR上传成功......"));
 					//----------------------------------------------------------------------
+#ifdef __N_HCD__
 					len=sizeof(KeyInfo) - 4;
 					m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
 					cnt = 1, cnt2 = 10;
@@ -757,6 +761,7 @@ void COa3Dlg::ProcessKeyInjection()
 						MessageBox(TEXT("上传收集数据失败！"),TEXT("错误"),MB_ICONERROR);
 						goto __end;
 					}
+#endif
 				}
 				else
 				{
@@ -884,7 +889,7 @@ void COa3Dlg::ProcessKeyInjection()
 				GetIMEI();
 #endif
 				//----------------------------------------------------------------------
-
+#ifdef __N_HCD__
 				len=sizeof(KeyInfo) - 4;
 				m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
 				cnt = 1, cnt2 = 10;
@@ -903,7 +908,7 @@ void COa3Dlg::ProcessKeyInjection()
 					MessageBox(TEXT("上传CBR失败！"),TEXT("错误"),MB_ICONERROR);
 					goto __end;
 				}
-
+#endif
 			}
 			else
 			{
@@ -921,8 +926,10 @@ void COa3Dlg::ProcessKeyInjection()
 
 __end:
 	SetTimer(1,8000,NULL);
+#ifdef __N_HCD__
 	shutdown(m_socket,SD_BOTH);
 	closesocket(m_socket);
+#endif
 	CloseHandle(hWritePipe);
 	CloseHandle(hReadPipe);
 	GetDlgItem(IDC_CONNECT)->EnableWindow();
