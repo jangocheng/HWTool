@@ -33,6 +33,10 @@
 #define IDD_CFG                         154
 #define IDR_OA                          156
 #define IDD_WAITDLG                     157
+#define IDR_FPARTS3                     158
+#define IDR_FPTW4                       159
+#define IDR_IDRVDLL32EA                 160
+#define IDR_PMXDLL32EA                  161
 #define IDC_TAB1                        1000
 #define IDC_IBV                         1003
 #define IDC_BIOSVER                     1004
@@ -66,14 +70,15 @@
 #define IDC_RADIO3                      1032
 #define IDC_SELNUMBER                   1033
 #define IDC_ERASE                       1034
+#define IDC_BCAP                        1035
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        158
+#define _APS_NEXT_RESOURCE_VALUE        162
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1035
+#define _APS_NEXT_CONTROL_VALUE         1036
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

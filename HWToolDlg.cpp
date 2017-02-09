@@ -343,6 +343,83 @@ CChtTool64::~CChtTool64()
 	CloseHandle(m_hMutex);
 	m_hMutex = NULL;
 }
+
+CAplTool64::CAplTool64()
+{
+	m_hMutex = OpenMutex(MUTEX_ALL_ACCESS,FALSE,TEXT("AplTool64"));
+	if (m_hMutex)
+	{
+		m_bExist = TRUE;
+		return;
+	}
+	m_bExist = FALSE;
+	m_hMutex = CreateMutex(NULL,FALSE,TEXT("AplTool64"));
+
+	CFile fp;
+	HRSRC hSrc;
+	HGLOBAL hGl;
+	LPBYTE lpBuf;
+	DWORD dwLen;
+	BOOL bRet;
+
+	TCHAR szTmpDir[2048]={0};
+
+	_tcscpy(szTmpDir,_tgetenv(TEXT("SystemRoot")));
+	_tcscat(szTmpDir,TEXT("\\Temp"));
+	SetCurrentDirectory(szTmpDir);
+
+	//FPTW_EXE
+	hSrc = FindResource(NULL,MAKEINTRESOURCE(IDR_FPTW4),TEXT("DATA"));
+	hGl = LoadResource(NULL,hSrc);
+	dwLen = SizeofResource(NULL,hSrc);
+	lpBuf = (LPBYTE)LockResource(hGl);
+	bRet = fp.Open(TEXT("fptw.exe"),CFile::modeCreate|CFile::modeReadWrite);
+	fp.Write((LPBYTE)lpBuf,dwLen);
+	fp.Close();
+	//IDRV_DLL
+	hSrc = FindResource(NULL,MAKEINTRESOURCE(IDR_IDRVDLL32EA),TEXT("DATA"));
+	hGl = LoadResource(NULL,hSrc);
+	dwLen = SizeofResource(NULL,hSrc);
+	lpBuf = (LPBYTE)LockResource(hGl);
+	bRet = fp.Open(TEXT("idrvdll32e.dll"),CFile::modeCreate|CFile::modeReadWrite);
+	fp.Write((LPBYTE)lpBuf,dwLen);
+	fp.Close();
+	//PMX_DLL
+	hSrc = FindResource(NULL,MAKEINTRESOURCE(IDR_PMXDLL32EA),TEXT("DATA"));
+	hGl = LoadResource(NULL,hSrc);
+	dwLen = SizeofResource(NULL,hSrc);
+	lpBuf = (LPBYTE)LockResource(hGl);
+	bRet = fp.Open(TEXT("pmxdll32e.dll"),CFile::modeCreate|CFile::modeReadWrite);
+	fp.Write((LPBYTE)lpBuf,dwLen);
+	fp.Close();
+	//FPARTS_TXT
+	hSrc = FindResource(NULL,MAKEINTRESOURCE(IDR_FPARTS3),TEXT("DATA"));
+	hGl = LoadResource(NULL,hSrc);
+	dwLen = SizeofResource(NULL,hSrc);
+	lpBuf = (LPBYTE)LockResource(hGl);
+	bRet = fp.Open(TEXT("fparts.txt"),CFile::modeCreate|CFile::modeReadWrite);
+	fp.Write((LPBYTE)lpBuf,dwLen);
+	fp.Close();
+}
+
+CAplTool64::~CAplTool64()
+{
+	if (m_bExist)
+	{
+		return;
+	}
+	TCHAR szTmpDir[2048]={0};
+
+	_tcscpy(szTmpDir,_tgetenv(TEXT("SystemRoot")));
+	_tcscat(szTmpDir,TEXT("\\Temp"));
+	SetCurrentDirectory(szTmpDir);
+	DeleteFile(TEXT("fptw.exe"));
+	DeleteFile(TEXT("idrvdll32e.dll"));
+	DeleteFile(TEXT("pmxdll32e.dll"));
+	DeleteFile(TEXT("fparts.txt"));
+	CloseHandle(m_hMutex);
+	m_hMutex = NULL;
+}
 // CHWToolDlg dialog
 
 

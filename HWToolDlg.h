@@ -51,6 +51,16 @@ private:
 	BOOL   m_bExist;
 };
 
+class CAplTool64
+{
+public:
+	CAplTool64();
+	virtual ~CAplTool64();
+private:
+	HANDLE m_hMutex;
+	BOOL   m_bExist;
+};
+
 // CHWToolDlg dialog
 class CHWToolDlg : public CDialog
 {

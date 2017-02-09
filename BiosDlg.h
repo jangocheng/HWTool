@@ -24,6 +24,7 @@ protected:
 	wchar_t m_wszCpuInfo[49];
 	int   m_nType;
 	BOOL m_bIsx64;
+	SYSTEM_POWER_STATUS Sps;
 	DECLARE_MESSAGE_MAP()
 public:
 	static UINT UpdateThread(LPVOID lp);
@@ -36,4 +37,7 @@ public:
 protected:
 	virtual void OnCancel();
 	virtual void OnOK();
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnDestroy();
 };

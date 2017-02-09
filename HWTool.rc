@@ -78,7 +78,7 @@ IDR_OA                  ICON                    "res\\oa.ico"
 IDD_HWTOOL_DIALOG DIALOGEX 0, 0, 332, 212
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST | WS_EX_APPWINDOW
-CAPTION "HuiWeiTool(Ver:07)"
+CAPTION "HuiWeiTool(Ver:11)"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,0,0,332,14
@@ -113,6 +113,7 @@ BEGIN
     PUSHBUTTON      "更新",IDC_UPDATE,138,160,54,16
     LTEXT           "",IDC_STATUS,0,186,331,12,SS_SUNKEN
     CONTROL         "保留序列号",IDC_SNCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,255,112,56,10
+    RTEXT           "",IDC_BCAP,256,173,73,11
 END
 
 IDD_DPK DIALOGEX 0, 0, 332, 198
@@ -249,8 +250,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,1,10586,7
- PRODUCTVERSION 10,1,10586,7
+ FILEVERSION 10,1,14393,11
+ PRODUCTVERSION 10,1,14393,11
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -267,13 +268,13 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
             VALUE "FileDescription", "Authorized by Kelvin Cheng"
-            VALUE "FileVersion", "10, 1, 10586, 7"
+            VALUE "FileVersion", "10, 1, 14393, 11"
             VALUE "InternalName", "HWTool.exe"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "LegalTrademarks", "Techvision"
             VALUE "OriginalFilename", "HWTool.exe"
             VALUE "ProductName", "HWTool Application"
-            VALUE "ProductVersion", "10, 1, 10586, 7"
+            VALUE "ProductVersion", "10, 1, 14393, 11"
         END
     END
     BLOCK "VarFileInfo"
@@ -304,6 +305,10 @@ IDR_IDRVDLL32E          DATA                    "res\\cht64\\idrvdll32e.DLL"
 IDR_PMXDLL32E           DATA                    "res\\cht64\\pmxdll32e.DLL"
 IDR_OACFG               DATA                    "res\\ami\\OA3ToolFile.cfg"
 IDR_OATOOL              DATA                    "res\\ami\\oa3tool.exe"
+IDR_FPARTS3             DATA                    "res\\apl\\fparts.txt"
+IDR_FPTW4               DATA                    "res\\apl\\FPTW64.exe"
+IDR_IDRVDLL32EA         DATA                    "res\\apl\\Idrvdll32e.dll"
+IDR_PMXDLL32EA          DATA                    "res\\apl\\Pmxdll32e.dll"
 
 /////////////////////////////////////////////////////////////////////////////
 //

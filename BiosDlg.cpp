@@ -32,6 +32,8 @@ BEGIN_MESSAGE_MAP(CBiosDlg, CDialog)
 	ON_BN_CLICKED(IDC_BROWSE, &CBiosDlg::OnBnClickedBrowse)
 	ON_BN_CLICKED(IDC_UPDATE, &CBiosDlg::OnBnClickedUpdate)
 	ON_WM_DROPFILES()
+	ON_WM_TIMER()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -102,6 +104,7 @@ void CBiosDlg::OnBnClickedUpdate()
 	//GUID CORM  = { 0x0ff0a55a, 0x0003, 0x0204, { 0x06, 0x02, 0x10, 0x15, 0x20, 0x01, 0x21, 0x00 } };
 	GUID BYTCR = { 0x0ff0a55a, 0x0003, 0x0204, { 0x06, 0x02, 0x10, 0x0b, 0x20, 0x00, 0x21, 0x00 } };
 	GUID CHT3  = { 0x0ff0a55a, 0x0003, 0x0204, { 0x06, 0x02, 0x10, 0x0e, 0x20, 0x00, 0x21, 0x00 } };
+	GUID APL  = { 0x0ff0a55a, 0x0003, 0x0004, { 0x08, 0x02, 0x10, 0x13, 0x00, 0x00, 0x00, 0x00 } };
 	GUID* pFw=NULL;
 
 	CHWToolDlg* pParent = (CHWToolDlg*)((CHWToolApp*)AfxGetApp())->m_pMainWnd;
@@ -125,6 +128,10 @@ void CBiosDlg::OnBnClickedUpdate()
 	{
 		m_nType = 2;
 	}
+	else if (wcsstr(m_wszCpuInfo,L"N3350") || wcsstr(m_wszCpuInfo,L"N3450") || wcsstr(m_wszCpuInfo,L"N4200"))
+	{
+		m_nType = 4;
+	}
 
 	if (m_nType == 1 || m_nType == 3)
 	{
@@ -133,6 +140,10 @@ void CBiosDlg::OnBnClickedUpdate()
 	else if (m_nType == 2)
 	{
 		pFw = &BYTCR;
+	}
+	else if (m_nType == 4)
+	{
+		pFw = &APL;
 	}
 	if (pFw == NULL)
 	{
@@ -198,6 +209,17 @@ void CBiosDlg::OnBnClickedUpdate()
 		fp.Close();
 		return;
 	}
+	if (Sps.BatteryLifePercent < 15 && (Sps.BatteryFlag&BATTERY_FLAG_CHARGING)!=BATTERY_FLAG_CHARGING)
+	{
+		MessageBox(TEXT("电池电量低（<15%）,请插上适配器再做升级！"),TEXT("错误"),MB_ICONERROR);
+		EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
+		GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
+		GetDlgItem(IDC_SNCHECK)->EnableWindow();
+		GetDlgItem(IDC_UPDATE)->EnableWindow();
+		GetDlgItem(IDC_BROWSE)->EnableWindow();
+		fp.Close();
+		return;
+	}
 	fp.Seek(0x42,SEEK_SET);
 	fp.Read(&m_nBiosSize,4);
 	m_nBiosSize >>= 16;
@@ -253,7 +275,9 @@ BOOL CBiosDlg::OnInitDialog()
 	// TODO:  Add extra initialization here
 	_tcscpy(m_szTempDir,_tgetenv(TEXT("SystemRoot")));
 	_tcscat(m_szTempDir,TEXT("\\Temp"));
-	GetCurrentDirectory(2048,m_curPath);
+	GetModuleFileName(NULL,m_curPath,2048);
+	*_tcsrchr(m_curPath,'\\') = 0;
+	//GetCurrentDirectory(2048,m_curPath);
 	typedef BOOL (WINAPI* ChangeWindowMessageFilterFn)( UINT, DWORD );
 	HMODULE hUserMod = NULL;
 	BOOL bResult = FALSE;
@@ -285,6 +309,21 @@ BOOL CBiosDlg::OnInitDialog()
 	SetDlgItemText(IDC_SERIALNUM,pInfo->m_BiosInfoW.m_wszSS);
 	SetDlgItemText(IDC_MBPID,pInfo->m_BiosInfoW.m_wszBM);
 	((CButton*)GetDlgItem(IDC_SNCHECK))->SetCheck(1);
+	memset(&Sps,0,sizeof(Sps));
+	if (GetSystemPowerStatus(&Sps))
+	{
+		CString szBCap;
+		if (Sps.BatteryLifePercent == 255)
+		{
+			szBCap.Format(TEXT("电池:未知,%s"),(Sps.BatteryFlag&8)==8 ? TEXT("充电中"):TEXT("未充电"));
+		}
+		else
+		{
+			szBCap.Format(TEXT("电池:%d%%,%s"),Sps.BatteryLifePercent,(Sps.BatteryFlag&8)==8 ? TEXT("充电中"):TEXT("未充电"));
+		}
+		SetDlgItemText(IDC_BCAP,szBCap);
+	}
+	SetTimer(1,500,NULL);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
@@ -316,6 +355,7 @@ int CBiosDlg::UpdateBios(void)
 	CBytTool* t1=0;
 	CChtTool86* t2=0;
 	CChtTool64* t3=0;
+	CAplTool64* t4=0;
 	CHWToolDlg* pParent = (CHWToolDlg*)((CHWToolApp*)AfxGetApp())->m_pMainWnd;
 	if (m_nType == 1)
 	{
@@ -328,6 +368,10 @@ int CBiosDlg::UpdateBios(void)
 	else if (m_nType == 3)
 	{
 		t3 = new CChtTool64();
+	}
+	else if (m_nType == 4)
+	{
+		t4 = new CAplTool64();
 	}
 	SetCurrentDirectory(m_szTempDir);
 	m_nSN = ((CButton*)GetDlgItem(IDC_SNCHECK))->GetCheck();
@@ -348,14 +392,40 @@ int CBiosDlg::UpdateBios(void)
 		ReadFile(hReadPipe,szRegion,dwLen,&dwRead,NULL);
 		if (dwRead)
 		{
-			char* szToken=strstr(szRegion,"BIOS       - Base: ");
+			char* szToken=strstr(szRegion,"BIOS      ");
+			int a,b,c,d;
 			char szLen[9]={0};
+			szToken=strstr(szToken,"0x");
 			if (szToken)
 			{
-				strncpy(szLen,szToken+19,8);
+				strncpy(szLen,szToken,8);
 				sscanf(szLen,"%x",&nActualBiosSize);
 				nActualBiosSize = 0x800000 - nActualBiosSize;
 			}
+
+			szToken=strstr(szRegion,"Read: ");
+			memset(szLen,0,sizeof(szLen));
+			strncpy(szLen,szToken+6,4);
+			b = strtol(szLen,NULL,16);
+			szToken=strstr(szRegion,"Write: ");
+			memset(szLen,0,sizeof(szLen));
+			strncpy(szLen,szToken+7,4);
+			a = strtol(szLen,NULL,16);
+
+			szToken=strstr(szToken+1,"Read: ");
+			memset(szLen,0,sizeof(szLen));
+			strncpy(szLen,szToken+6,4);
+			d = strtol(szLen,NULL,16);
+			szToken=strstr(szToken+1,"Write: ");
+			memset(szLen,0,sizeof(szLen));
+			strncpy(szLen,szToken+7,4);
+			c = strtol(szLen,NULL,16);
+
+			if (a==0x0a && b==0x0b && c==0x0c && d==0x0d)
+			{
+				nLock = 1;
+			}
+			SetDlgItemText(IDC_STATUS,nLock?TEXT("TXE/ME 已锁定"):TEXT("TXE/ME 未锁定"));
 		}
 		delete szRegion;
 	}
@@ -365,44 +435,6 @@ int CBiosDlg::UpdateBios(void)
 		goto end;
 	}
 
-	retval=CreateProcessA(NULL,"cmd.exe /c fptw.exe -dumplock",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
-	if(retval)
-	{
-		WaitForSingleObject(pi.hThread,INFINITE);
-		CloseHandle(pi.hThread);
-		CloseHandle(pi.hProcess);
-		dwLen=GetFileSize(hReadPipe,NULL);
-		char* szRegion = new char[dwLen];
-		ReadFile(hReadPipe,szRegion,dwLen,&dwRead,NULL);
-		if (dwRead)
-		{
-			char* szToken=strstr(szRegion,"Host CPU master:    ");
-			int a,b,c,d,nCPU=0,nTXE=0;
-			if (szToken)
-			{
-				szToken += 20;
-				if (4 == sscanf(szToken,"%x %x %x %x",&a,&b,&c,&d))
-				{
-					nCPU = (a<<24) + (b<<16) + (c<<8) + d;
-				}
-			}
-			szToken=strstr(szRegion,"TXE region master:  ");
-			if (szToken)
-			{
-				szToken += 20;
-				if (4 == sscanf(szToken,"%x %x %x %x",&a,&b,&c,&d))
-				{
-					nTXE = (a<<24) + (b<<16) + (c<<8) + d;
-				}
-			}
-			if (nCPU == 0x0B0A && nTXE == 0x0D0C)
-			{
-				nLock = 1;
-			}
-		}
-		SetDlgItemText(IDC_STATUS,nLock?TEXT("TXE/ME 已锁定"):TEXT("TXE/ME 未锁定"));
-		delete szRegion;
-	}
 	Sleep(2000);
 	//////////////////////////////////////////////////////////////////////
 	retval=CreateProcessA(NULL,"cmd.exe /c Check.exe",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
@@ -465,11 +497,11 @@ int CBiosDlg::UpdateBios(void)
 
 	if (nLock == 0)
 	{
-		cmd="cmd.exe /c fptw.exe -f fw.bin";
+		cmd="cmd.exe /c fptw.exe -f fw.bin -y";
 	}
 	else
 	{
-		cmd="cmd.exe /c fptw.exe -f fw.bin -bios";
+		cmd="cmd.exe /c fptw.exe -f fw.bin -bios -y";
 	}
 	Sleep(2000);
 	SetDlgItemText(IDC_STATUS,TEXT("正在刷写BIOS......"));
@@ -570,11 +602,6 @@ int CBiosDlg::UpdateBios(void)
 		}
 	}
 end:
-	CloseHandle(hWritePipe);
-	CloseHandle(hReadPipe);
-	if (t1) delete t1;
-	if (t2) delete t2;
-	if (t3) delete t3;
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 	GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 	GetDlgItem(IDC_SNCHECK)->EnableWindow();
@@ -596,6 +623,14 @@ end:
 		DeleteFile(TEXT("amifldrv64.sys"));
 		Sleep(1000);
 		SetDlgItemText(IDC_STATUS,TEXT("正在重启系统......"));
+
+		retval=CreateProcessA(NULL,"cmd.exe /c fptw.exe -greset",&sa,&sa,0,0,NULL,NULL,&si,&pi);
+		WaitForSingleObject(pi.hThread,INFINITE);
+		GetExitCodeProcess(pi.hProcess,&retCode1);
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+
+		/*
 		OpenProcessToken(GetCurrentProcess(),TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY,&hToken);
 		LookupPrivilegeValue(NULL,SE_SHUTDOWN_NAME,&tkp.Privileges[0].Luid);
 		tkp.PrivilegeCount = 1;
@@ -603,11 +638,18 @@ end:
 		AdjustTokenPrivileges(hToken,FALSE,&tkp,sizeof(TOKEN_PRIVILEGES),NULL,0);
 		ExitWindowsEx(EWX_FORCE|EWX_REBOOT,0);
 		CloseHandle(hToken);
+		*/
 	}
 	else
 	{
 		MessageBox(szErrMsg,TEXT("升级错误"),MB_ICONERROR);
 	}
+	CloseHandle(hWritePipe);
+	CloseHandle(hReadPipe);
+	if (t1) delete t1;
+	if (t2) delete t2;
+	if (t3) delete t3;
+	if (t4) delete t4;
 
 	return 0;
 }
@@ -624,4 +666,31 @@ void CBiosDlg::OnOK()
 	// TODO: Add your specialized code here and/or call the base class
 
 	//CDialog::OnOK();
+}
+
+void CBiosDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: Add your message handler code here and/or call default
+	if (GetSystemPowerStatus(&Sps))
+	{
+		CString szBCap;
+		if (Sps.BatteryLifePercent == 255)
+		{
+			szBCap.Format(TEXT("电池:未知,%s"),(Sps.BatteryFlag&8)==8 ? TEXT("充电中"):TEXT("未充电"));
+		}
+		else
+		{
+			szBCap.Format(TEXT("电池:%d%%,%s"),Sps.BatteryLifePercent,(Sps.BatteryFlag&8)==8 ? TEXT("充电中"):TEXT("未充电"));
+		}
+		SetDlgItemText(IDC_BCAP,szBCap);
+	}
+	CDialog::OnTimer(nIDEvent);
+}
+
+void CBiosDlg::OnDestroy()
+{
+	CDialog::OnDestroy();
+
+	// TODO: Add your message handler code here
+	KillTimer(1);
 }

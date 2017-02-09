@@ -375,6 +375,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\res\apl\fparts.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\res\cht86\fptw.exe"
 			>
 		</File>
@@ -383,11 +387,19 @@
 			>
 		</File>
 		<File
+			RelativePath=".\res\apl\FPTW64.exe"
+			>
+		</File>
+		<File
 			RelativePath=".\res\cht64\fptw64.exe"
 			>
 		</File>
 		<File
 			RelativePath=".\res\byt\Idrvdll.dll"
+			>
+		</File>
+		<File
+			RelativePath=".\res\apl\Idrvdll32e.dll"
 			>
 		</File>
 		<File
@@ -404,6 +416,10 @@
 		</File>
 		<File
 			RelativePath=".\res\byt\Pmxdll.dll"
+			>
+		</File>
+		<File
+			RelativePath=".\res\apl\Pmxdll32e.dll"
 			>
 		</File>
 		<File
