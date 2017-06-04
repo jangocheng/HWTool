@@ -411,6 +411,7 @@ DWORD COa3Dlg::CRC32(DWORD crc,BYTE *buffer, DWORD size)
     return crc ;  
 }  
 
+#if 0
 BOOL COa3Dlg::GetProductKey()
 {
 	BOOL retval,result=FALSE;
@@ -498,7 +499,92 @@ end:
 	}
 	return result;
 }
+#else
+BOOL COa3Dlg::GetProductKey()
+{
+	BOOL retval,result=FALSE;
+	PROCESS_INFORMATION pi={0};
+	STARTUPINFOA si={0};
+	SECURITY_ATTRIBUTES sa={0};
+	HANDLE hReadPipe,hWritePipe;
+	DWORD retcode = -1;
+	CFile fp;
 
+	SetCurrentDirectory(m_szTempDir);
+	memset(&m_pkInfo,0,sizeof(m_pkInfo));
+	sa.bInheritHandle=TRUE;
+	sa.nLength=sizeof SECURITY_ATTRIBUTES;
+	sa.lpSecurityDescriptor=NULL;
+	retval=CreatePipe(&hReadPipe,&hWritePipe,&sa,0);
+	if(retval)
+	{
+		si.cb=sizeof STARTUPINFO;
+		si.wShowWindow=SW_HIDE;
+		si.dwFlags=STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;
+		si.hStdOutput=si.hStdError=hWritePipe;
+		retval=CreateProcessA(NULL,"powershell.exe (get-wmiobject softwarelicensingservice).OA3xOriginalProductKey",&sa,&sa,TRUE,0,NULL,0,&si,&pi);
+		if(retval)
+		{
+			DWORD dwLen,dwRead;
+			WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
+			GetExitCodeProcess(pi.hProcess,&retcode);
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+			if (retcode != 0)
+			{
+				goto end;
+			}
+			dwLen=GetFileSize(hReadPipe,NULL);
+			if (dwLen < 31)
+			{
+				goto end;
+			}
+			char *buff=new char [dwLen];
+			memset(buff,0,dwLen);
+			retval=ReadFile(hReadPipe,buff,dwLen-2,&dwRead,NULL);
+			strncpy(m_pkInfo.key,buff,29);
+			result = TRUE;
+			delete buff;
+		}
+		if (result == FALSE)
+		{
+			goto end;
+		}
+		retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=oa3toolfile.cfg",&sa,&sa,TRUE,0,NULL,0,&si,&pi);
+		if(retval)
+		{
+			DWORD dwLen;
+			WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
+			GetExitCodeProcess(pi.hProcess,&retcode);
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+			if (retcode)
+			{
+				goto end;
+			}
+			if (!fp.Open(TEXT("oa3.xml"),CFile::modeRead|CFile::typeBinary))
+			{
+				goto end;
+			}
+			dwLen=(DWORD)fp.GetLength();
+			char* fBuff = new char[dwLen];
+			char pkid[14]={0};
+			fp.Read(fBuff,dwLen);
+			fp.Close();
+			char* dpk=strstr(fBuff,"<ProductKeyID>");
+			if (dpk)
+			{
+				strncpy(m_pkInfo.pkid,dpk+14,13);
+			}
+			delete fBuff;
+		}
+end:
+		CloseHandle(hWritePipe);
+		CloseHandle(hReadPipe);
+	}
+	return result;
+}
+#endif
 void COa3Dlg::ProcessKeyInjection()
 {
 
