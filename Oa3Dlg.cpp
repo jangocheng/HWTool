@@ -411,7 +411,7 @@ DWORD COa3Dlg::CRC32(DWORD crc,BYTE *buffer, DWORD size)
     return crc ;  
 }  
 
-#if 0
+#if 1
 BOOL COa3Dlg::GetProductKey()
 {
 	BOOL retval,result=FALSE;
