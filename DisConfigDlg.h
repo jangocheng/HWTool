@@ -3,8 +3,10 @@
 #include "waitdlg.h"
 
 typedef struct {
+	wchar_t database[32];
 	wchar_t business[32];
 	wchar_t ip[32];
+	wchar_t ip2[32];
 	wchar_t password[32];
 	int idx;
 	wchar_t para[32];
@@ -14,14 +16,14 @@ typedef struct {
 	wchar_t hastouch[32];
 	wchar_t screensize[32];
 	wchar_t Id[40];
+	int nUip;
 
 }DpkCfg;
 
 typedef struct
 {
 	wchar_t Name[40];
-	wchar_t Id[40];
-	wchar_t DbConnectionString[128];
+	wchar_t Id[8];
 }Configuration;
 
 typedef struct

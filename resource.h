@@ -8,7 +8,7 @@
 #define IDD_DPK                         105
 #define IDD_SN                          106
 #define IDD_OADLG                       107
-#define IDR_MAINFRAME                   156
+#define IDR_OA                          128
 #define IDR_AFUWIN                      129
 #define IDR_AMIDEWIN                    130
 #define IDR_AMIFLDRV32                  131
@@ -31,7 +31,7 @@
 #define IDR_OACFG                       152
 #define IDR_OATOOL                      153
 #define IDD_CFG                         154
-#define IDR_OA                          128
+#define IDR_MAINFRAME                   156
 #define IDD_WAITDLG                     157
 #define IDC_TAB1                        1000
 #define IDC_IBV                         1003
@@ -66,6 +66,9 @@
 #define IDC_RADIO3                      1032
 #define IDC_SELNUMBER                   1033
 #define IDC_ERASE                       1034
+#define IDC_SERVIP2                     1035
+#define IDC_DATABASE                    1036
+#define IDC_GIP                         1037
 
 // Next default values for new objects
 // 
@@ -73,7 +76,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        158
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1035
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

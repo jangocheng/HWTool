@@ -61,10 +61,10 @@ public:
 
 private:
 	DpkCfg m_cfg;
-	char m_szIP[32],m_szPara[32],m_szParaValue[32],m_szSKU[32],m_szType[32],m_szSubType[32],m_szScreenSize[32],m_szTouch[32],m_szSN[32],m_szCloud[40];
+	char m_szIP[32],m_szPara[32],m_szParaValue[32],m_szSKU[32],m_szType[32],m_szSubType[32],m_szScreenSize[32],m_szTouch[32],m_szTrackInfo[32],m_szSN[32],m_szCloud[40];
 public:
 	virtual BOOL OnInitDialog();
-	int m_nIndex;
+	int m_nIndex, m_nCheckIp;
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	void ProcessKeyInjection();
 	static UINT KeyThread(LPVOID lpv);
@@ -81,4 +81,6 @@ public:
 protected:
 	virtual void OnCancel();
 	virtual void OnOK();
+public:
+	afx_msg void OnBnClickedGip();
 };

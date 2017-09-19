@@ -52,8 +52,9 @@ const char* strOATool =
           <Value>%s</Value>\r\n\
         </Field>\r\n\
       </OEMOptionalInfo>\r\n\
+      <TrackingInfo>%s</TrackingInfo>\r\n\
       <SerialNumber>%s</SerialNumber>\r\n\
-      <CloudConfigurationID>%s</CloudConfigurationID>\r\n\
+      <BusinessID>%s</BusinessID>\r\n\
     </Parameters>\r\n\
   </ServerBased>\r\n\
   <OutputData>\r\n\
@@ -205,6 +206,7 @@ BEGIN_MESSAGE_MAP(COa3Dlg, CDialog)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_INJECT, &COa3Dlg::OnBnClickedInject)
 	ON_BN_CLICKED(IDC_ERASE, &COa3Dlg::OnBnClickedErase)
+	ON_BN_CLICKED(IDC_GIP, &COa3Dlg::OnBnClickedGip)
 END_MESSAGE_MAP()
 
 
@@ -213,7 +215,8 @@ END_MESSAGE_MAP()
 void COa3Dlg::OnBnClickedConnect()
 {
 	// TODO: Add your control notification handler code here
-	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
+	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);//database
+	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);//kmt server
 	BYTE szIP[4];
 	char szCfg[2048] = {0};
 	CWaitDlg wDlg;
@@ -221,10 +224,23 @@ void COa3Dlg::OnBnClickedConnect()
 	GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow(0);
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_DISABLED);
 	ip->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
+	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
 	CDisConfigDlg Dlg(&m_cfg);
 	if (szIP[0] == 0)
 	{
 		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
+		goto end;
+	}
+	ip2->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
+	if (szIP[0] == 0)
+	{
+		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
+		goto end;
+	}
+	GetDlgItemText(IDC_DATABASE,m_cfg.database,32);
+	if (wcslen(m_cfg.database) == 0)
+	{
+		MessageBox(TEXT("请输入数据库名"),TEXT("错误"),MB_ICONERROR);
 		goto end;
 	}
 	GetDlgItemText(IDC_PWD,m_cfg.password,32);
@@ -233,7 +249,8 @@ void COa3Dlg::OnBnClickedConnect()
 		MessageBox(TEXT("请输入密码"),TEXT("错误"),MB_ICONERROR);
 		goto end;
 	}
-	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
+	wsprintf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
+	m_cfg.nUip = m_nCheckIp;
 	wDlg.Create(IDD_WAITDLG,this);
 	wDlg.SetWindowPos(&CWnd::wndTopMost,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
 	wDlg.CenterWindow(this);
@@ -270,7 +287,7 @@ void COa3Dlg::OnBnClickedConnect()
 		SetDlgItemText(IDC_TOUCH,m_cfg.hastouch);
 
 		/////////////////////////////////////////////
-		wcstombs(m_szIP,m_cfg.ip,32);
+		wcstombs(m_szIP,m_cfg.ip2,32);
 		strcpy(m_szPara,szKeyString[m_cfg.idx]);
 		wcstombs(m_szParaValue,m_cfg.para,32);
 		wcstombs(m_szSKU,m_cfg.sku,32);
@@ -278,13 +295,14 @@ void COa3Dlg::OnBnClickedConnect()
 		wcstombs(m_szSubType,m_cfg.subtype,32);
 		wcstombs(m_szScreenSize,m_cfg.screensize,32);
 		wcstombs(m_szTouch,m_cfg.hastouch,32);
+		strcpy(m_szTrackInfo,"00000000");
 		strcpy(m_szSN,"00000000");
 		wcstombs(m_szCloud,m_cfg.Id,40);
 
 		(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 		wcscat(filepath,TEXT("oa3tool.cfg"));
 		fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-		sprintf(szCfg,strOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szSN,m_szCloud);
+		sprintf(szCfg,strOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN,m_szCloud);
 		fp.Write(szCfg,(UINT)strlen(szCfg));
 		fp.Close();
 		SetCurrentDirectory(m_szTempDir);
@@ -308,6 +326,8 @@ BOOL COa3Dlg::OnInitDialog()
 	char szCfg[2048] = {0};
 	UINT szIP[4];
 	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
+	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
+	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
 	_tcscpy(m_szTempDir,_tgetenv(TEXT("SystemRoot")));
 	_tcscat(m_szTempDir,TEXT("\\Temp"));
 
@@ -322,11 +342,14 @@ BOOL COa3Dlg::OnInitDialog()
 	wcscat(filepath,TEXT("cfg"));
 	if (fp.Open(filepath,CFile::modeRead))
 	{
-		if (sizeof(m_cfg) == fp.Read((LPBYTE)&m_cfg,sizeof(m_cfg)))
+		if (sizeof(m_cfg) == fp.GetLength() && sizeof(m_cfg) == fp.Read((LPBYTE)&m_cfg,sizeof(m_cfg)))
 		{
 			fp.Close();
 			m_nIndex = m_cfg.idx;
+			m_nCheckIp = m_cfg.nUip;
+			pIx->SetCheck(m_nCheckIp);
 			UpdateData(0);
+			SetDlgItemText(IDC_DATABASE,m_cfg.database);
 			SetDlgItemText(IDC_SELNUMBER,m_cfg.para);
 			SetDlgItemText(IDC_BUSINESS,m_cfg.business);
 			SetDlgItemText(IDC_MODEL,m_cfg.sku);
@@ -337,8 +360,17 @@ BOOL COa3Dlg::OnInitDialog()
 			SetDlgItemText(IDC_PWD,m_cfg.password);
 			swscanf(m_cfg.ip,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
 			ip->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
+			if (!m_nCheckIp)
+			{
+				swscanf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
+			}
+			else
+			{
+				ip->EnableWindow(0);
+			}
+			ip2->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 			/////////////////////////////////////////////////
-			wcstombs(m_szIP,m_cfg.ip,32);
+			wcstombs(m_szIP,m_cfg.ip2,32);
 			strcpy(m_szPara,szKeyString[m_cfg.idx]);
 			wcstombs(m_szParaValue,m_cfg.para,32);
 			wcstombs(m_szSKU,m_cfg.sku,32);
@@ -346,13 +378,14 @@ BOOL COa3Dlg::OnInitDialog()
 			wcstombs(m_szSubType,m_cfg.subtype,32);
 			wcstombs(m_szScreenSize,m_cfg.screensize,32);
 			wcstombs(m_szTouch,m_cfg.hastouch,32);
+			strcpy(m_szTrackInfo,"00000000");
 			strcpy(m_szSN,"00000000");
 			wcstombs(m_szCloud,m_cfg.Id,40);
 
 			(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 			wcscat(filepath,TEXT("oa3tool.cfg"));
 			fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-			sprintf(szCfg,strOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szSN,m_szCloud);
+			sprintf(szCfg,strOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN,m_szCloud);
 			fp.Write(szCfg,(UINT)strlen(szCfg));
 			fp.Close();
 			SetCurrentDirectory(m_szTempDir);
@@ -1015,6 +1048,11 @@ __end:
 	GetDlgItem(IDC_ERASE)->EnableWindow();
 	GetDlgItem(IDC_INJECT)->EnableWindow();
 	GetDlgItem(IDC_SERVIP)->EnableWindow();
+	if (!((CButton*)GetDlgItem(IDC_GIP))->GetCheck())
+	{
+		GetDlgItem(IDC_SERVIP2)->EnableWindow();
+		GetDlgItem(IDC_GIP)->EnableWindow();
+	}
 	GetDlgItem(IDC_PWD)->EnableWindow();
 
 }
@@ -1043,6 +1081,8 @@ void COa3Dlg::OnBnClickedInject()
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
 	GetDlgItem(IDC_INJECT)->EnableWindow(0);
 	GetDlgItem(IDC_SERVIP)->EnableWindow(0);
+	GetDlgItem(IDC_SERVIP2)->EnableWindow(0);
+	GetDlgItem(IDC_GIP)->EnableWindow(0);
 	GetDlgItem(IDC_PWD)->EnableWindow(0);
 	CloseHandle(CreateThread(0,0,(LPTHREAD_START_ROUTINE)KeyThread,this,0,0));
 }
@@ -1054,6 +1094,8 @@ void COa3Dlg::OnBnClickedErase()
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
 	GetDlgItem(IDC_INJECT)->EnableWindow(0);
 	GetDlgItem(IDC_SERVIP)->EnableWindow(0);
+	GetDlgItem(IDC_SERVIP2)->EnableWindow(0);
+	GetDlgItem(IDC_GIP)->EnableWindow(0);
 	GetDlgItem(IDC_PWD)->EnableWindow(0);
 	CloseHandle(CreateThread(0,0,(LPTHREAD_START_ROUTINE)KeyEraseThread,this,0,0));
 }
@@ -1118,6 +1160,11 @@ void COa3Dlg::EraseKey()
 	GetDlgItem(IDC_ERASE)->EnableWindow();
 	GetDlgItem(IDC_INJECT)->EnableWindow();
 	GetDlgItem(IDC_SERVIP)->EnableWindow();
+	if (!((CButton*)GetDlgItem(IDC_GIP))->GetCheck())
+	{
+		GetDlgItem(IDC_SERVIP2)->EnableWindow();
+		GetDlgItem(IDC_GIP)->EnableWindow();
+	}
 	GetDlgItem(IDC_PWD)->EnableWindow();
 }
 
@@ -1140,4 +1187,24 @@ void COa3Dlg::OnOK()
 	// TODO: Add your specialized code here and/or call the base class
 
 	//CDialog::OnOK();
+}
+
+void COa3Dlg::OnBnClickedGip()
+{
+	// TODO: Add your control notification handler code here
+	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
+	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
+	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
+	DWORD dwIP;
+	ip2->GetAddress(dwIP);
+	m_nCheckIp = pIx->GetCheck();
+	if (m_nCheckIp)
+	{
+		GetDlgItem(IDC_SERVIP)->EnableWindow(0);
+		ip->SetAddress(dwIP);
+	}
+	else
+	{
+		GetDlgItem(IDC_SERVIP)->EnableWindow();
+	}
 }
