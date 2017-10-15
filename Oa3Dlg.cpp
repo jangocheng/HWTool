@@ -186,6 +186,7 @@ COa3Dlg::COa3Dlg(CWnd* pParent /*=NULL*/)
 	, m_nIndex(0)
 {
 	memset(&m_cfg,0,sizeof(m_cfg));
+	m_nOAType = -1;
 }
 
 COa3Dlg::~COa3Dlg()
@@ -207,6 +208,8 @@ BEGIN_MESSAGE_MAP(COa3Dlg, CDialog)
 	ON_BN_CLICKED(IDC_INJECT, &COa3Dlg::OnBnClickedInject)
 	ON_BN_CLICKED(IDC_ERASE, &COa3Dlg::OnBnClickedErase)
 	ON_BN_CLICKED(IDC_GIP, &COa3Dlg::OnBnClickedGip)
+	ON_BN_CLICKED(IDC_OA3, &COa3Dlg::OnBnClickedOa3)
+	ON_BN_CLICKED(IDC_CLOUDOA, &COa3Dlg::OnBnClickedCloudoa)
 END_MESSAGE_MAP()
 
 
@@ -226,6 +229,11 @@ void COa3Dlg::OnBnClickedConnect()
 	ip->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
 	CDisConfigDlg Dlg(&m_cfg);
+	if (m_nOAType == -1)
+	{
+		MessageBox(TEXT("请选择OA服务器的版本"),TEXT("错误"),MB_ICONERROR);
+		goto end;
+	}
 	if (szIP[0] == 0)
 	{
 		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
@@ -349,6 +357,14 @@ BOOL COa3Dlg::OnInitDialog()
 			m_nCheckIp = m_cfg.nUip;
 			pIx->SetCheck(m_nCheckIp);
 			UpdateData(0);
+			if (m_nOAType)
+			{
+				((CButton*)GetDlgItem(IDC_CLOUDOA))->SetCheck(1);
+			}
+			else
+			{
+				((CButton*)GetDlgItem(IDC_OA3))->SetCheck(1);
+			}
 			SetDlgItemText(IDC_DATABASE,m_cfg.database);
 			SetDlgItemText(IDC_SELNUMBER,m_cfg.para);
 			SetDlgItemText(IDC_BUSINESS,m_cfg.business);
@@ -1207,4 +1223,16 @@ void COa3Dlg::OnBnClickedGip()
 	{
 		GetDlgItem(IDC_SERVIP)->EnableWindow();
 	}
+}
+
+void COa3Dlg::OnBnClickedOa3()
+{
+	// TODO: Add your control notification handler code here
+	m_nOAType = 0;
+}
+
+void COa3Dlg::OnBnClickedCloudoa()
+{
+	// TODO: Add your control notification handler code here
+	m_nOAType = 1;
 }

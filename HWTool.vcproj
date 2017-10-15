@@ -195,19 +195,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\BiosDlg.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\CpuInfo.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\DisConfigDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DpkDlg.cpp"
 				>
 			</File>
 			<File
@@ -220,10 +212,6 @@
 			</File>
 			<File
 				RelativePath=".\Oa3Dlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SnDlg.cpp"
 				>
 			</File>
 			<File
@@ -265,19 +253,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\BiosDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\CpuInfo.h"
 				>
 			</File>
 			<File
 				RelativePath=".\DisConfigDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DpkDlg.h"
 				>
 			</File>
 			<File
@@ -294,10 +274,6 @@
 			</File>
 			<File
 				RelativePath=".\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SnDlg.h"
 				>
 			</File>
 			<File
@@ -368,19 +344,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\byt\fparts.txt"
-			>
-		</File>
-		<File
 			RelativePath=".\res\cht86\fparts.txt"
 			>
 		</File>
 		<File
-			RelativePath=".\res\cht86\fptw.exe"
+			RelativePath=".\res\byt\fparts.txt"
 			>
 		</File>
 		<File
 			RelativePath=".\res\byt\fptw.exe"
+			>
+		</File>
+		<File
+			RelativePath=".\res\cht86\fptw.exe"
 			>
 		</File>
 		<File

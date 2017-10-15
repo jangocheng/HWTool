@@ -17,6 +17,7 @@ typedef struct {
 	wchar_t screensize[32];
 	wchar_t Id[40];
 	int nUip;
+	int nOAType;
 
 }DpkCfg;
 
