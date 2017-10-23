@@ -16,13 +16,14 @@ wchar_t* subTypes[3][3] =
 	{TEXT("Standard"),TEXT(""),TEXT("")}
 };
 
-CDisConfigDlg::CDisConfigDlg(DpkCfg* pCfg, CWnd* pParent /*=NULL*/)
+CDisConfigDlg::CDisConfigDlg(DpkCfg* pCfg, int nType, CWnd* pParent /*=NULL*/)
 	: CDialog(CDisConfigDlg::IDD, pParent)
 	, m_nIndex(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_OA);
 	m_nIndex = 0;
 	m_pCfg = pCfg;
+	m_nType = nType;
 	try
 	{
 		m_pConn.CreateInstance(__uuidof(Connection));
@@ -218,151 +219,295 @@ int CDisConfigDlg::BuildConfiguration(void)
 	POSITION pos;
 	CString connectionstr, strXmlDesc;
 
-	connectionstr.Format(TEXT("Provider=SQLOLEDB.1;Data Source=%s;Initial Catalog=%s;User ID=sa;Password=%s"),m_pCfg->ip,m_pCfg->database,m_pCfg->password);
-	try
+	if (m_nType == 1)
 	{
-		if (m_pConn->GetState() & adStateOpen) 
+		connectionstr.Format(TEXT("Provider=SQLOLEDB.1;Data Source=%s;Initial Catalog=%s;User ID=sa;Password=%s"),m_pCfg->ip,m_pCfg->database,m_pCfg->password);
+		try
 		{
-			m_pConn->Close();
-		}
-		//	Configuration cfg = {0};
-		m_pConn->Open((LPTSTR)(LPCTSTR)connectionstr, TEXT(""),TEXT(""),adModeUnknown);
-
-		//---------------------------------------read configuration from database-----------------------------------------------------
-		if (m_pRds->GetState() & adStateOpen) 
-		{
-			m_pRds->Close();
-		}
-		m_pRds->Open(TEXT("SELECT Name, Value FROM Configuration"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
-		while (!m_pRds->adoEOF)
-		{
-			_variant_t var,index;
-			index.vt = VT_I4;
-			index.intVal=0;
-			var = m_pRds->GetCollect(index);
-			if(var.vt!=VT_NULL)
+			if (m_pConn->GetState() & adStateOpen) 
 			{
-				if (wcscmp(var.bstrVal,TEXT("CloudOASettingVersion2")))
+				m_pConn->Close();
+			}
+			//	Configuration cfg = {0};
+			m_pConn->Open((LPTSTR)(LPCTSTR)connectionstr, TEXT(""),TEXT(""),adModeUnknown);
+
+			//---------------------------------------read configuration from database-----------------------------------------------------
+			if (m_pRds->GetState() & adStateOpen) 
+			{
+				m_pRds->Close();
+			}
+			m_pRds->Open(TEXT("SELECT Name, Value FROM Configuration"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+			while (!m_pRds->adoEOF)
+			{
+				_variant_t var,index;
+				index.vt = VT_I4;
+				index.intVal=0;
+				var = m_pRds->GetCollect(index);
+				if(var.vt!=VT_NULL)
 				{
+					if (wcscmp(var.bstrVal,TEXT("CloudOASettingVersion2")))
+					{
+						m_pRds->MoveNext();
+						continue;
+					}
+					index.intVal=1;
+					var = m_pRds->GetCollect(index);
+					if(var.vt!=VT_NULL)
+					{
+						strXmlDesc = var.bstrVal;
+						break;
+					}
+				}
+				m_pRds->MoveNext();
+			}
+
+			if (strXmlDesc.GetLength())
+			{
+				wchar_t* pDesc, *pFirst, *pEnd;
+				pDesc = (LPTSTR)(LPCTSTR)strXmlDesc;
+				pFirst = wcsstr(pDesc,TEXT("<BusinessName>"));
+				while (pFirst)
+				{
+					Configuration cfg = {0};
+					pFirst += wcslen(TEXT("<BusinessName>"));
+					pEnd = wcsstr(pFirst,TEXT("</BusinessName>"));
+					wcsncpy(cfg.Name, pFirst, pEnd - pFirst);
+					pFirst = pEnd + wcslen(TEXT("</BusinessName>"));
+
+					pFirst = wcsstr(pFirst,TEXT("<BusinessId>"));
+					pFirst += wcslen(TEXT("<BusinessId>"));
+					pEnd = wcsstr(pFirst,TEXT("</BusinessId>"));
+					wcsncpy(cfg.Id, pFirst, pEnd - pFirst);
+					pFirst = pEnd + wcslen(TEXT("</BusinessId>"));
+					m_ConfigurationList.AddTail(cfg);
+
+					pFirst = wcsstr(pFirst,TEXT("<BusinessName>"));
+				};
+	//			m_ConfigurationList.AddTail(cfg);
+			}
+
+			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			pos = m_ConfigurationList.GetHeadPosition();
+			while (pos)
+			{
+				Configuration cfg = m_ConfigurationList.GetNext(pos);
+				wchar_t wszSql[256]={0};
+				if (m_pRds->GetState() & adStateOpen) 
+				{
+					m_pRds->Close();
+				}
+				wsprintf(wszSql,TEXT("select distinct A.LicensablePartNumber from ProductKeyInfo as A, KeyInfoEx as B where A.ProductKeyID=B.ProductKeyID and B.CloudOA_BusinessId=\'%s\'"),cfg.Id);
+				m_pRds->Open(wszSql, m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+				while (!m_pRds->adoEOF)
+				{
+					ParaIndex pdx = {0};
+					_variant_t var,index;
+					wcscpy(pdx.Name,cfg.Name);
+					index.vt = VT_I4;
+					index.intVal=0;
+					var = m_pRds->GetCollect(index);
+					if(var.vt!=VT_NULL)
+					{
+						wcscpy(pdx.Parameter,var.bstrVal);
+					}
+					m_ParaLicList.AddTail(pdx);
 					m_pRds->MoveNext();
-					continue;
+				}
+				if (m_pRds->GetState() & adStateOpen) 
+				{
+					m_pRds->Close();
+				}
+				wsprintf(wszSql,TEXT("select distinct A.OEMPONumber from ProductKeyInfo as A, KeyInfoEx as B where A.ProductKeyID=B.ProductKeyID and B.CloudOA_BusinessId=\'%s\'"),cfg.Id);
+				m_pRds->Open(wszSql, m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+				while (!m_pRds->adoEOF)
+				{
+					ParaIndex pdx = {0};
+					_variant_t var,index;
+					wcscpy(pdx.Name,cfg.Name);
+					index.vt = VT_I4;
+					index.intVal=0;
+					var = m_pRds->GetCollect(index);
+					if(var.vt!=VT_NULL)
+					{
+						wcscpy(pdx.Parameter,var.bstrVal);
+					}
+					m_ParaOemPOList.AddTail(pdx);
+					m_pRds->MoveNext();
+				}
+				if (m_pRds->GetState() & adStateOpen) 
+				{
+					m_pRds->Close();
+				}
+				wsprintf(wszSql,TEXT("select distinct A.OEMPartNumber from ProductKeyInfo as A, KeyInfoEx as B where A.ProductKeyID=B.ProductKeyID and B.CloudOA_BusinessId=\'%s\'"),cfg.Id);
+				m_pRds->Open(wszSql, m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+				while (!m_pRds->adoEOF)
+				{
+					ParaIndex pdx = {0};
+					_variant_t var,index;
+					wcscpy(pdx.Name,cfg.Name);
+					index.vt = VT_I4;
+					index.intVal=0;
+					var = m_pRds->GetCollect(index);
+					if(var.vt!=VT_NULL)
+					{
+						wcscpy(pdx.Parameter,var.bstrVal);
+					}
+					m_ParaOemPartList.AddTail(pdx);
+					m_pRds->MoveNext();
+				}
+				if (m_pRds->GetState() & adStateOpen) 
+				{
+					m_pRds->Close();
+				}
+			}
+		}
+		catch (_com_error e)
+		{
+			_tcscpy(m_szDesc,e.Description());
+			goto err;
+		}
+	}
+	else if (m_nType == 0)//OA3
+	{
+		connectionstr.Format(TEXT("Provider=SQLOLEDB.1;Data Source=%s;Initial Catalog=DISConfigurationDB;User ID=sa;Password=%s"),m_pCfg->ip,m_pCfg->password);
+		try
+		{
+			if (m_pConn->GetState() & adStateOpen) 
+			{
+				m_pConn->Close();
+			}
+			m_pConn->Open((LPTSTR)(LPCTSTR)connectionstr, TEXT(""),TEXT(""),adModeUnknown);
+			if (m_pRds->GetState() & adStateOpen) 
+			{
+				m_pRds->Close();
+			}
+			m_pRds->Open(TEXT("SELECT BusinessName, BusinessID, DatabaseName FROM Business WHERE Status=1"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+			//get records
+			wchar_t buff[128] = {0};
+			while (!m_pRds->adoEOF)
+			{
+				Configuration cfg = {0};
+				_variant_t var,index;
+				index.vt = VT_I4;
+				index.intVal=0;
+				var = m_pRds->GetCollect(index);
+				if(var.vt!=VT_NULL)
+				{
+					wcscpy(cfg.Name,var.bstrVal);
 				}
 				index.intVal=1;
 				var = m_pRds->GetCollect(index);
 				if(var.vt!=VT_NULL)
 				{
-					strXmlDesc = var.bstrVal;
-					break;
+					wcscpy(cfg.Id,var.bstrVal);
 				}
-			}
-			m_pRds->MoveNext();
-		}
-
-		if (strXmlDesc.GetLength())
-		{
-			wchar_t* pDesc, *pFirst, *pEnd;
-			pDesc = (LPTSTR)(LPCTSTR)strXmlDesc;
-			pFirst = wcsstr(pDesc,TEXT("<BusinessName>"));
-			while (pFirst)
-			{
-				Configuration cfg = {0};
-				pFirst += wcslen(TEXT("<BusinessName>"));
-				pEnd = wcsstr(pFirst,TEXT("</BusinessName>"));
-				wcsncpy(cfg.Name, pFirst, pEnd - pFirst);
-				pFirst = pEnd + wcslen(TEXT("</BusinessName>"));
-
-				pFirst = wcsstr(pFirst,TEXT("<BusinessId>"));
-				pFirst += wcslen(TEXT("<BusinessId>"));
-				pEnd = wcsstr(pFirst,TEXT("</BusinessId>"));
-				wcsncpy(cfg.Id, pFirst, pEnd - pFirst);
-				pFirst = pEnd + wcslen(TEXT("</BusinessId>"));
+				index.intVal=2;
+				var = m_pRds->GetCollect(index);
+				if(var.vt!=VT_NULL)
+				{
+					wcscpy(buff,var.bstrVal);
+					wsprintf(cfg.DbConnectionString,TEXT("Provider=SQLOLEDB.1;Data Source=%s;Initial Catalog=%s;User ID=sa;Password=%s"),m_pCfg->ip,buff,m_pCfg->password);
+				}
 				m_ConfigurationList.AddTail(cfg);
-
-				pFirst = wcsstr(pFirst,TEXT("<BusinessName>"));
-			};
-//			m_ConfigurationList.AddTail(cfg);
+				m_pRds->MoveNext();
+			}
+			if (m_pRds->GetState() & adStateOpen) 
+			{
+				m_pRds->Close();
+			}
+			if (m_pConn->GetState() & adStateOpen) 
+			{
+				m_pConn->Close();
+			}
 		}
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		catch (_com_error e)
+		{
+			_tcscpy(m_szDesc,e.Description());
+			goto err;
+		}
+		//collect all parameter from all customer database
 		pos = m_ConfigurationList.GetHeadPosition();
 		while (pos)
 		{
 			Configuration cfg = m_ConfigurationList.GetNext(pos);
-			wchar_t wszSql[256]={0};
-			if (m_pRds->GetState() & adStateOpen) 
+			try
 			{
-				m_pRds->Close();
-			}
-			wsprintf(wszSql,TEXT("select distinct A.LicensablePartNumber from ProductKeyInfo as A, KeyInfoEx as B where A.ProductKeyID=B.ProductKeyID and B.CloudOA_BusinessId=\'%s\'"),cfg.Id);
-			m_pRds->Open(wszSql, m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
-			while (!m_pRds->adoEOF)
-			{
-				ParaIndex pdx = {0};
-				_variant_t var,index;
-				wcscpy(pdx.Name,cfg.Name);
-				index.vt = VT_I4;
-				index.intVal=0;
-				var = m_pRds->GetCollect(index);
-				if(var.vt!=VT_NULL)
+				if (m_pConn->GetState() & adStateOpen) 
 				{
-					wcscpy(pdx.Parameter,var.bstrVal);
+					m_pConn->Close();
 				}
-				m_ParaLicList.AddTail(pdx);
-				m_pRds->MoveNext();
-			}
-			if (m_pRds->GetState() & adStateOpen) 
-			{
-				m_pRds->Close();
-			}
-			wsprintf(wszSql,TEXT("select distinct A.OEMPONumber from ProductKeyInfo as A, KeyInfoEx as B where A.ProductKeyID=B.ProductKeyID and B.CloudOA_BusinessId=\'%s\'"),cfg.Id);
-			m_pRds->Open(wszSql, m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
-			while (!m_pRds->adoEOF)
-			{
-				ParaIndex pdx = {0};
-				_variant_t var,index;
-				wcscpy(pdx.Name,cfg.Name);
-				index.vt = VT_I4;
-				index.intVal=0;
-				var = m_pRds->GetCollect(index);
-				if(var.vt!=VT_NULL)
+				m_pConn->Open(cfg.DbConnectionString, TEXT(""),TEXT(""),adModeUnknown);
+				if (m_pRds->GetState() & adStateOpen) 
 				{
-					wcscpy(pdx.Parameter,var.bstrVal);
+					m_pRds->Close();
 				}
-				m_ParaOemPOList.AddTail(pdx);
-				m_pRds->MoveNext();
-			}
-			if (m_pRds->GetState() & adStateOpen) 
-			{
-				m_pRds->Close();
-			}
-			wsprintf(wszSql,TEXT("select distinct A.OEMPartNumber from ProductKeyInfo as A, KeyInfoEx as B where A.ProductKeyID=B.ProductKeyID and B.CloudOA_BusinessId=\'%s\'"),cfg.Id);
-			m_pRds->Open(wszSql, m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
-			while (!m_pRds->adoEOF)
-			{
-				ParaIndex pdx = {0};
-				_variant_t var,index;
-				wcscpy(pdx.Name,cfg.Name);
-				index.vt = VT_I4;
-				index.intVal=0;
-				var = m_pRds->GetCollect(index);
-				if(var.vt!=VT_NULL)
+				m_pRds->Open(TEXT("SELECT LicensablePartNumber FROM ProductKeyInfo group by LicensablePartNumber"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+				while (!m_pRds->adoEOF)
 				{
-					wcscpy(pdx.Parameter,var.bstrVal);
+					ParaIndex pdx = {0};
+					_variant_t var,index;
+					wcscpy(pdx.Name,cfg.Name);
+					index.vt = VT_I4;
+					index.intVal=0;
+					var = m_pRds->GetCollect(index);
+					if(var.vt!=VT_NULL)
+					{
+						wcscpy(pdx.Parameter,var.bstrVal);
+					}
+					m_ParaLicList.AddTail(pdx);
+					m_pRds->MoveNext();
 				}
-				m_ParaOemPartList.AddTail(pdx);
-				m_pRds->MoveNext();
+				if (m_pRds->GetState() & adStateOpen) 
+				{
+					m_pRds->Close();
+				}
+				m_pRds->Open(TEXT("SELECT OEMPONumber FROM ProductKeyInfo group by OEMPONumber"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+				while (!m_pRds->adoEOF)
+				{
+					ParaIndex pdx = {0};
+					_variant_t var,index;
+					wcscpy(pdx.Name,cfg.Name);
+					index.vt = VT_I4;
+					index.intVal=0;
+					var = m_pRds->GetCollect(index);
+					if(var.vt!=VT_NULL)
+					{
+						wcscpy(pdx.Parameter,var.bstrVal);
+					}
+					m_ParaOemPOList.AddTail(pdx);
+					m_pRds->MoveNext();
+				}
+				if (m_pRds->GetState() & adStateOpen) 
+				{
+					m_pRds->Close();
+				}
+				m_pRds->Open(TEXT("SELECT OEMPartNumber FROM ProductKeyInfo group by OEMPartNumber"), m_pConn.GetInterfacePtr(), adOpenDynamic, adLockOptimistic, adCmdText);
+				while (!m_pRds->adoEOF)
+				{
+					ParaIndex pdx = {0};
+					_variant_t var,index;
+					wcscpy(pdx.Name,cfg.Name);
+					index.vt = VT_I4;
+					index.intVal=0;
+					var = m_pRds->GetCollect(index);
+					if(var.vt!=VT_NULL)
+					{
+						wcscpy(pdx.Parameter,var.bstrVal);
+					}
+					m_ParaOemPartList.AddTail(pdx);
+					m_pRds->MoveNext();
+				}
+				if (m_pRds->GetState() & adStateOpen) 
+				{
+					m_pRds->Close();
+				}
 			}
-			if (m_pRds->GetState() & adStateOpen) 
+			catch (_com_error e)
 			{
-				m_pRds->Close();
+				_tcscpy(m_szDesc,e.Description());
+				goto err;
 			}
 		}
-	}
-	catch (_com_error e)
-	{
-		TRACE((TCHAR*)e.Description());
-		TRACE(e.ErrorMessage());
-		goto err;
 	}
 	return 0;
 err:
@@ -379,8 +524,7 @@ err:
 	}
 	catch (_com_error e)
 	{
-		TRACE((TCHAR*)e.Description());
-		TRACE(e.ErrorMessage());
+		_tcscpy(m_szDesc,e.Description());
 	}
 
 	return -1;
@@ -469,9 +613,8 @@ int CDisConfigDlg::BuildParameter()
 	UpdateData(FALSE);
 	sel = pBox->GetCurSel();
 
-	//if (sel != -1)//business selection is valid
+	if (m_nType == 1)
 	{
-		//pBox->GetLBText(sel,lbText);
 		switch (m_pCfg->idx)
 		{
 		case 0:
@@ -542,6 +685,84 @@ int CDisConfigDlg::BuildParameter()
 			break;
 		default:
 			break;
+		}
+	}
+	else if (m_nType == 0)
+	{
+		pBox->GetLBText(sel,lbText);
+		if (sel != -1)//business selection is valid
+		{
+			switch (m_pCfg->idx)
+			{
+			case 0:
+				pos = m_ParaLicList.GetHeadPosition();
+				while (pos)
+				{
+					paraIndex = m_ParaLicList.GetNext(pos);
+					if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
+					{
+						pSelBox->AddString(paraIndex.Parameter);
+					}
+				}
+				count = pSelBox->GetCount();
+				pSelBox->SetCurSel(0);
+				for (int i=0;i<count;i++)
+				{
+					pSelBox->GetLBText(i,lbText);
+					if (lbText.Compare(m_pCfg->para) == 0)
+					{
+						pSelBox->SetCurSel(i);
+						break;
+					}
+				}
+				break;
+			case 1:
+				pos = m_ParaOemPOList.GetHeadPosition();
+				while (pos)
+				{
+					paraIndex = m_ParaOemPOList.GetNext(pos);
+					if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
+					{
+						pSelBox->AddString(paraIndex.Parameter);
+					}
+				}
+				count = pSelBox->GetCount();
+				pSelBox->SetCurSel(0);
+				for (int i=0;i<count;i++)
+				{
+					pSelBox->GetLBText(i,lbText);
+					if (lbText.Compare(m_pCfg->para) == 0)
+					{
+						pSelBox->SetCurSel(i);
+						break;
+					}
+				}
+				break;
+			case 2:
+				pos = m_ParaOemPartList.GetHeadPosition();
+				while (pos)
+				{
+					paraIndex = m_ParaOemPartList.GetNext(pos);
+					if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
+					{
+						pSelBox->AddString(paraIndex.Parameter);
+					}
+				}
+				count = pSelBox->GetCount();
+				pSelBox->SetCurSel(0);
+				for (int i=0;i<count;i++)
+				{
+					pSelBox->GetLBText(i,lbText);
+					if (lbText.Compare(m_pCfg->para) == 0)
+					{
+						pSelBox->SetCurSel(i);
+						break;
+					}
+				}
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	return 0;

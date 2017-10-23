@@ -148,7 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\OA3.0.exe"
+				OutputFile="$(OutDir)\CloudDis.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="false"
 				SubSystem="2"
@@ -192,6 +192,10 @@
 			>
 			<File
 				RelativePath=".\AdoDB.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CloudOADlg.cpp"
 				>
 			</File>
 			<File
@@ -250,6 +254,10 @@
 			>
 			<File
 				RelativePath=".\AdoDB.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CloudOADlg.h"
 				>
 			</File>
 			<File
@@ -344,19 +352,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\cht86\fparts.txt"
-			>
-		</File>
-		<File
 			RelativePath=".\res\byt\fparts.txt"
 			>
 		</File>
 		<File
-			RelativePath=".\res\byt\fptw.exe"
+			RelativePath=".\res\cht86\fparts.txt"
 			>
 		</File>
 		<File
 			RelativePath=".\res\cht86\fptw.exe"
+			>
+		</File>
+		<File
+			RelativePath=".\res\byt\fptw.exe"
 			>
 		</File>
 		<File

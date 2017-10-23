@@ -17,14 +17,14 @@ typedef struct {
 	wchar_t screensize[32];
 	wchar_t Id[40];
 	int nUip;
-	int nOAType;
 
 }DpkCfg;
 
 typedef struct
 {
 	wchar_t Name[40];
-	wchar_t Id[8];
+	wchar_t Id[40];
+	wchar_t DbConnectionString[128];
 }Configuration;
 
 typedef struct
@@ -40,7 +40,7 @@ class CDisConfigDlg : public CDialog
 	DECLARE_DYNAMIC(CDisConfigDlg)
 
 public:
-	CDisConfigDlg(DpkCfg* pCfg, CWnd* pParent = NULL);   // standard constructor
+	CDisConfigDlg(DpkCfg* pCfg, int nType, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CDisConfigDlg();
 
 // Dialog Data
@@ -50,11 +50,12 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
-	int m_nIndex;
+	int m_nIndex,m_nType;
 	HICON m_hIcon;
 public:
 	afx_msg void OnBnClickedRadio1();
 	afx_msg void OnBnClickedOk();
+	TCHAR m_szDesc[256];
 private:
 	static UINT ProcessThread(LPVOID lpv);
 	_ConnectionPtr m_pConn;

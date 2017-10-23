@@ -17,10 +17,13 @@ CBiosInfo::CBiosInfo()
 
 void CBiosInfo::RebuildInfo()
 {
+	wchar_t filepath[MAX_PATH] = {0};
+	GetModuleFileName(NULL,filepath,MAX_PATH);
+	(wcsrchr(filepath,TEXT('\\')))[0] = 0;
+	_tcscpy(m_szTempDir,filepath);
+
 	memset(&m_BiosInfoA,0,sizeof(m_BiosInfoA));
 	memset(&m_BiosInfoW,0,sizeof(m_BiosInfoW));
-	_tcscpy(m_szTempDir,_tgetenv(TEXT("SystemRoot")));
-	_tcscat(m_szTempDir,TEXT("\\Temp"));
 //*************************************************
 	BOOL retval;
 	PROCESS_INFORMATION pi={0};
@@ -282,7 +285,7 @@ BOOL CHWToolApp::InitInstance()
 	m_hMutex=OpenMutex(MUTEX_ALL_ACCESS,FALSE,TEXT("HUIWEITool"));
 	if(m_hMutex)
 	{
-		HWND hWnd=FindWindow(NULL,TEXT("HuiWeiTool - OA3.0(Ver:06)"));
+		HWND hWnd=FindWindow(NULL,TEXT("CloudDis(10.5.0.2)"));
 		if (hWnd)
 		{
 			if(!IsWindowVisible(hWnd))

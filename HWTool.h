@@ -13,6 +13,40 @@
 // CHWToolApp:
 // See HWTool.cpp for the implementation of this class
 //
+#define __MAC
+#ifdef __MAC
+#define _WIN32_DCOM
+#include <comdef.h>
+#include <atlbase.h>
+#include <rpcsal.h>
+// headers needed to use Mobile Broadband APIs 
+#pragma comment(lib, "mbnapi_uuid.lib")
+#include "mbnapi.h"
+#pragma comment(lib, "IPHLPAPI.lib")
+#include <iphlpapi.h>
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+#endif
+
+typedef struct _tagKeyInfo
+{
+	char BSN[32];
+	char SSN[32];
+	char PKID[32];
+	char KEY[32];
+	char WIFI[32];
+	char BT[32];
+	char IMEI[32];
+	DWORD CRC;
+}KeyInfo,*PKeyInfo;
+
+typedef struct
+{
+	char pkid[32];
+	char key[32];
+}ProductKeyInfo;
+
+
 
 typedef struct 
 {

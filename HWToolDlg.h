@@ -4,6 +4,7 @@
 #pragma once
 #include "CpuInfo.h"
 #include "Oa3Dlg.h"
+#include "CloudOaDlg.h"
 
 #pragma warning(disable:4996)
 
@@ -29,6 +30,8 @@ protected:
 	CImageList m_ImgList;
 	HICON m_hIconFw,m_hIconSn,m_hIconKey,m_hIconOa;
 	COa3Dlg m_OaDlg;
+	CCloudOADlg m_CloudOADlg;
+	TCHAR  m_szINI[MAX_PATH];
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();

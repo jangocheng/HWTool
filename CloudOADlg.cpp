@@ -1,23 +1,23 @@
-// Oa3Dlg.cpp : implementation file
+// CloudOADlg.cpp : implementation file
 //
 
 #include "stdafx.h"
 #include "HWTool.h"
-#include "Oa3Dlg.h"
+#include "CloudOADlg.h"
 #include "HWToolDlg.h"
 
 
-// COa3Dlg dialog
+// CCloudOADlg dialog
 
-IMPLEMENT_DYNAMIC(COa3Dlg, CDialog)
-const char* szKeyString[3] = 
+IMPLEMENT_DYNAMIC(CCloudOADlg, CDialog)
+const char* szCloudKeyString[3] = 
 {
 	"LicensablePartNumber",
 	"OEMPONumber",
 	"OEMPartNumber"
 };
 
-const char* strOATool = 
+const char* strCloudOATool = 
 {
 "<?xml version=\"1.0\"?>\r\n\
 <OA3 xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n\
@@ -52,8 +52,9 @@ const char* strOATool =
           <Value>%s</Value>\r\n\
         </Field>\r\n\
       </OEMOptionalInfo>\r\n\
+      <TrackingInfo>%s</TrackingInfo>\r\n\
       <SerialNumber>%s</SerialNumber>\r\n\
-      <CloudConfigurationID>%s</CloudConfigurationID>\r\n\
+      <BusinessID>%s</BusinessID>\r\n\
     </Parameters>\r\n\
   </ServerBased>\r\n\
   <OutputData>\r\n\
@@ -65,7 +66,7 @@ const char* strOATool =
 
 #ifdef __MAC
 
-BOOL COa3Dlg::GetDeviceAddress()
+BOOL CCloudOADlg::GetDeviceAddress()
 {
     DWORD dwSize = 0;
     DWORD dwRetVal = 0;
@@ -146,7 +147,7 @@ BOOL COa3Dlg::GetDeviceAddress()
 	return bRet;
 }
 
-BOOL COa3Dlg::GetIMEI()
+BOOL CCloudOADlg::GetIMEI()
 {
     SAFEARRAY *psa = NULL;
 	LONG lBound=0;
@@ -180,18 +181,18 @@ END:
 
 
 #endif
-COa3Dlg::COa3Dlg(CWnd* pParent /*=NULL*/)
-	: CDialog(COa3Dlg::IDD, pParent)
+CCloudOADlg::CCloudOADlg(CWnd* pParent /*=NULL*/)
+	: CDialog(CCloudOADlg::IDD, pParent)
 	, m_nIndex(0)
 {
 	memset(&m_cfg,0,sizeof(m_cfg));
 }
 
-COa3Dlg::~COa3Dlg()
+CCloudOADlg::~CCloudOADlg()
 {
 }
 
-void COa3Dlg::DoDataExchange(CDataExchange* pDX)
+void CCloudOADlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Radio(pDX, IDC_RADIO1, m_nIndex);
@@ -199,21 +200,23 @@ void COa3Dlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
-BEGIN_MESSAGE_MAP(COa3Dlg, CDialog)
-	ON_BN_CLICKED(IDC_CONNECT, &COa3Dlg::OnBnClickedConnect)
+BEGIN_MESSAGE_MAP(CCloudOADlg, CDialog)
+	ON_BN_CLICKED(IDC_CONNECT, &CCloudOADlg::OnBnClickedConnect)
 	ON_WM_TIMER()
 	ON_WM_DESTROY()
-	ON_BN_CLICKED(IDC_INJECT, &COa3Dlg::OnBnClickedInject)
-	ON_BN_CLICKED(IDC_ERASE, &COa3Dlg::OnBnClickedErase)
+	ON_BN_CLICKED(IDC_INJECT, &CCloudOADlg::OnBnClickedInject)
+	ON_BN_CLICKED(IDC_ERASE, &CCloudOADlg::OnBnClickedErase)
+	ON_BN_CLICKED(IDC_GIP, &CCloudOADlg::OnBnClickedGip)
 END_MESSAGE_MAP()
 
 
-// COa3Dlg message handlers
+// CCloudOADlg message handlers
 
-void COa3Dlg::OnBnClickedConnect()
+void CCloudOADlg::OnBnClickedConnect()
 {
 	// TODO: Add your control notification handler code here
-	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
+	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);//database
+	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);//kmt server
 	BYTE szIP[4];
 	char szCfg[2048] = {0};
 	CWaitDlg wDlg;
@@ -221,10 +224,23 @@ void COa3Dlg::OnBnClickedConnect()
 	GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow(0);
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_DISABLED);
 	ip->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
-	CDisConfigDlg Dlg(&m_cfg,0);
+	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
+	CDisConfigDlg Dlg(&m_cfg,1);
+	ip2->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 	if (szIP[0] == 0)
 	{
 		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
+		goto end;
+	}
+	if (szIP[0] == 0)
+	{
+		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
+		goto end;
+	}
+	GetDlgItemText(IDC_DATABASE,m_cfg.database,32);
+	if (wcslen(m_cfg.database) == 0)
+	{
+		MessageBox(TEXT("请输入数据库名"),TEXT("错误"),MB_ICONERROR);
 		goto end;
 	}
 	GetDlgItemText(IDC_PWD,m_cfg.password,32);
@@ -233,7 +249,8 @@ void COa3Dlg::OnBnClickedConnect()
 		MessageBox(TEXT("请输入密码"),TEXT("错误"),MB_ICONERROR);
 		goto end;
 	}
-	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
+	wsprintf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
+	m_cfg.nUip = m_nCheckIp;
 	wDlg.Create(IDD_WAITDLG,this);
 	wDlg.SetWindowPos(&CWnd::wndTopMost,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
 	wDlg.CenterWindow(this);
@@ -250,7 +267,7 @@ void COa3Dlg::OnBnClickedConnect()
 		wchar_t filepath[MAX_PATH] = {0};
 		GetModuleFileName(NULL,filepath,MAX_PATH);
 		(wcsrchr(filepath,TEXT('\\')))[1] = 0;
-		wcscat(filepath,TEXT("dis.cfg"));
+		wcscat(filepath,TEXT("cloud.cfg"));
 		if(!fp.Open(filepath,CFile::modeCreate|CFile::modeWrite))
 		{
 			MessageBox(TEXT("保存配置文件失败，请确保磁盘可写"),TEXT("错误"),MB_ICONERROR);
@@ -275,28 +292,24 @@ void COa3Dlg::OnBnClickedConnect()
 		SetDlgItemText(IDC_TOUCH,m_cfg.hastouch);
 
 		/////////////////////////////////////////////
-		wcstombs(m_szIP,m_cfg.ip,32);
-		strcpy(m_szPara,szKeyString[m_cfg.idx]);
+		wcstombs(m_szIP,m_cfg.ip2,32);
+		strcpy(m_szPara,szCloudKeyString[m_cfg.idx]);
 		wcstombs(m_szParaValue,m_cfg.para,32);
 		wcstombs(m_szSKU,m_cfg.sku,32);
 		wcstombs(m_szType,m_cfg.maintype,32);
 		wcstombs(m_szSubType,m_cfg.subtype,32);
 		wcstombs(m_szScreenSize,m_cfg.screensize,32);
 		wcstombs(m_szTouch,m_cfg.hastouch,32);
+		strcpy(m_szTrackInfo,"00000000");
 		strcpy(m_szSN,"00000000");
 		wcstombs(m_szCloud,m_cfg.Id,40);
 
-		
 		(wcsrchr(filepath,TEXT('\\')))[1] = 0;
-		wcscat(filepath,TEXT("oa3tool.cfg"));
+		wcscat(filepath,TEXT("cldtool.cfg"));
 		fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-		sprintf(szCfg,strOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szSN,m_szCloud);
+		sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN,m_szCloud);
 		fp.Write(szCfg,(UINT)strlen(szCfg));
 		fp.Close();
-		//SetCurrentDirectory(m_szTempDir);
-		//fp.Open(TEXT("oa3tool.cfg"),CFile::modeCreate|CFile::modeWrite);
-		//fp.Write(szCfg,(UINT)strlen(szCfg));
-		//fp.Close();
 	}
 end:
 	GetDlgItem(IDC_CONNECT)->EnableWindow();
@@ -304,7 +317,7 @@ end:
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 }
 
-BOOL COa3Dlg::OnInitDialog()
+BOOL CCloudOADlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
@@ -314,6 +327,8 @@ BOOL COa3Dlg::OnInitDialog()
 	char szCfg[2048] = {0};
 	UINT szIP[4];
 	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
+	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
+	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
 
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2,2),&wsa);
@@ -324,14 +339,17 @@ BOOL COa3Dlg::OnInitDialog()
 	GetModuleFileName(NULL,filepath,MAX_PATH);
 	(wcsrchr(filepath,TEXT('\\')))[0] = 0;
 	_tcscpy(m_szTempDir,filepath);
-	wcscat(filepath,TEXT("\\dis.cfg"));
+	wcscat(filepath,TEXT("\\cloud.cfg"));
 	if (fp.Open(filepath,CFile::modeRead))
 	{
 		if (sizeof(m_cfg) == fp.GetLength() && sizeof(m_cfg) == fp.Read((LPBYTE)&m_cfg,sizeof(m_cfg)))
 		{
 			fp.Close();
 			m_nIndex = m_cfg.idx;
+			m_nCheckIp = m_cfg.nUip;
+			pIx->SetCheck(m_nCheckIp);
 			UpdateData(0);
+			SetDlgItemText(IDC_DATABASE,m_cfg.database);
 			SetDlgItemText(IDC_SELNUMBER,m_cfg.para);
 			SetDlgItemText(IDC_BUSINESS,m_cfg.business);
 			SetDlgItemText(IDC_MODEL,m_cfg.sku);
@@ -347,22 +365,33 @@ BOOL COa3Dlg::OnInitDialog()
 			SetDlgItemText(IDC_PWD,m_cfg.password);
 			swscanf(m_cfg.ip,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
 			ip->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
+			if (!m_nCheckIp)
+			{
+				swscanf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
+				ip->EnableWindow();
+			}
+			else
+			{
+				ip->EnableWindow(0);
+			}
+			ip2->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 			/////////////////////////////////////////////////
-			wcstombs(m_szIP,m_cfg.ip,32);
-			strcpy(m_szPara,szKeyString[m_cfg.idx]);
+			wcstombs(m_szIP,m_cfg.ip2,32);
+			strcpy(m_szPara,szCloudKeyString[m_cfg.idx]);
 			wcstombs(m_szParaValue,m_cfg.para,32);
 			wcstombs(m_szSKU,m_cfg.sku,32);
 			wcstombs(m_szType,m_cfg.maintype,32);
 			wcstombs(m_szSubType,m_cfg.subtype,32);
 			wcstombs(m_szScreenSize,m_cfg.screensize,32);
 			wcstombs(m_szTouch,m_cfg.hastouch,32);
+			strcpy(m_szTrackInfo,"00000000");
 			strcpy(m_szSN,"00000000");
 			wcstombs(m_szCloud,m_cfg.Id,40);
 
 			(wcsrchr(filepath,TEXT('\\')))[1] = 0;
-			wcscat(filepath,TEXT("oa3tool.cfg"));
+			wcscat(filepath,TEXT("cldtool.cfg"));
 			fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-			sprintf(szCfg,strOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szSN,m_szCloud);
+			sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN,m_szCloud);
 			fp.Write(szCfg,(UINT)strlen(szCfg));
 			fp.Close();
 			//SetCurrentDirectory(m_szTempDir);
@@ -375,7 +404,7 @@ BOOL COa3Dlg::OnInitDialog()
 			fp.Close();
 			memset(&m_cfg,0,sizeof(m_cfg));
 			(wcsrchr(filepath,TEXT('\\')))[1] = 0;
-			wcscat(filepath,TEXT("oa3tool.cfg"));
+			wcscat(filepath,TEXT("cldtool.cfg"));
 			DeleteFile(filepath);
 		}
 	}
@@ -383,7 +412,7 @@ BOOL COa3Dlg::OnInitDialog()
 	//----------------------------------------------------------------
 #if 0
 	CFile fpc;
-	if (fpc.Open(TEXT("oa3tool.cfg"),CFile::modeReadWrite))
+	if (fpc.Open(TEXT("cldtool.cfg"),CFile::modeReadWrite))
 	{
 		char* pDesc, *pFirst, *pEnd;
 		DWORD fLen = fpc.GetLength();
@@ -405,7 +434,7 @@ BOOL COa3Dlg::OnInitDialog()
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void COa3Dlg::OnTimer(UINT_PTR nIDEvent)
+void CCloudOADlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: Add your message handler code here and/or call default
 	if (nIDEvent == 1)
@@ -417,7 +446,7 @@ void COa3Dlg::OnTimer(UINT_PTR nIDEvent)
 }
 
 
-void COa3Dlg::init_crc_table()  
+void CCloudOADlg::init_crc_table()  
 {  
     DWORD c;  
     DWORD i, j;  
@@ -434,7 +463,7 @@ void COa3Dlg::init_crc_table()
     }  
 }  
 
-DWORD COa3Dlg::CRC32(DWORD crc,BYTE *buffer, DWORD size)  
+DWORD CCloudOADlg::CRC32(DWORD crc,BYTE *buffer, DWORD size)  
 {  
     DWORD i;  
     for (i = 0; i < size; i++) {  
@@ -444,7 +473,7 @@ DWORD COa3Dlg::CRC32(DWORD crc,BYTE *buffer, DWORD size)
 }  
 
 #if 1
-BOOL COa3Dlg::GetProductKey()
+BOOL CCloudOADlg::GetProductKey()
 {
 	BOOL retval,result=FALSE;
 	PROCESS_INFORMATION pi={0};
@@ -532,7 +561,7 @@ end:
 	return result;
 }
 #else
-BOOL COa3Dlg::GetProductKey()
+BOOL CCloudOADlg::GetProductKey()
 {
 	BOOL retval,result=FALSE;
 	PROCESS_INFORMATION pi={0};
@@ -617,7 +646,7 @@ end:
 	return result;
 }
 #endif
-void COa3Dlg::ProcessKeyInjection()
+void CCloudOADlg::ProcessKeyInjection()
 {
 
 	CFile fp;
@@ -646,7 +675,7 @@ void COa3Dlg::ProcessKeyInjection()
 	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	SetCurrentDirectory(m_szTempDir);
-	if (fp.Open(TEXT("oa3tool.cfg"),CFile::modeRead))
+	if (fp.Open(TEXT("cldtool.cfg"),CFile::modeRead))
 	{
 		dwLen = (DWORD)fp.GetLength();
 		szBuf = new char[dwLen];
@@ -703,7 +732,7 @@ void COa3Dlg::ProcessKeyInjection()
 	if (!bHasKey)
 	{
 		SetDlgItemText(IDC_STATUS,TEXT("在正从服务器获取KEY......"));
-		retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /assemble /configfile=oa3tool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
+		retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /assemble /configfile=cldtool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
 		WaitForSingleObject(pi.hThread,INFINITE);
 		GetExitCodeProcess(pi.hProcess,&retCode);
 		if (retCode)
@@ -835,7 +864,7 @@ void COa3Dlg::ProcessKeyInjection()
 		{
 			SetDlgItemText(IDC_STATUS,TEXT("正在上传CBR......"));
 			CFile fpc;
-			if (fpc.Open(TEXT("oa3tool.cfg"),CFile::modeReadWrite))
+			if (fpc.Open(TEXT("cldtool.cfg"),CFile::modeReadWrite))
 			{
 				char* pDesc, *pFirst, *pEnd;
 				DWORD fLen = fpc.GetLength();
@@ -855,7 +884,7 @@ void COa3Dlg::ProcessKeyInjection()
 			iCount = 5;
 			while (iCount-- > 0)
 			{
-				retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=oa3tool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
+				retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=cldtool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
 				WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
 				GetExitCodeProcess(pi.hProcess,&retCode);
 				if (retCode == 0)
@@ -918,83 +947,83 @@ void COa3Dlg::ProcessKeyInjection()
 	else
 	{
 #if 1
-				if (1)
+		if (1)
+		{
+			char buff[256] = {0};
+			CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
+			if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
+			{
+				strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
+				GUID guid;
+				CoCreateGuid(&guid);
+				memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
+				sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+				mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
+				strcat(buff,pInfo->m_BiosInfoA.m_szSU);
+				strcat(buff,"\"");
+				retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
+				WaitForSingleObject(pi.hThread,INFINITE);
+				CloseHandle(pi.hThread);
+				CloseHandle(pi.hProcess);
+			}
+		}
+		retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /bs",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
+		if(retval)
+		{
+			WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+			dwLen=GetFileSize(hReadPipe,NULL);
+			char *buf=new char[dwLen+1];
+			retval=ReadFile(hReadPipe,buf,dwLen,&dwRead,NULL);
+			if (strlen(buf))
+			{
+				char* p1=strchr(buf,'"');
+				if (p1)
 				{
-					char buff[256] = {0};
-					CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
-					if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
+					p1++;
+					char* p2=strchr(p1,'"');
+					if (p2)
 					{
-						strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
-						GUID guid;
-						CoCreateGuid(&guid);
-						memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
-						sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
-						mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
-						strcat(buff,pInfo->m_BiosInfoA.m_szSU);
-						strcat(buff,"\"");
-						retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
-						WaitForSingleObject(pi.hThread,INFINITE);
-						CloseHandle(pi.hThread);
-						CloseHandle(pi.hProcess);
+						*p2 = 0;
+						strcpy(m_KeyInfo.BSN,p1);
 					}
 				}
-				retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /bs",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
-				if(retval)
+			}
+			delete buf;
+		}
+		//----------------------------------------------------------------------
+		retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /ss",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
+		if(retval)
+		{
+			WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
+			CloseHandle(pi.hThread);
+			CloseHandle(pi.hProcess);
+			dwLen=GetFileSize(hReadPipe,NULL);
+			char *buf=new char[dwLen+1];
+			retval=ReadFile(hReadPipe,buf,dwLen,&dwRead,NULL);
+			if (strlen(buf))
+			{
+				char* p1=strchr(buf,'"');
+				if (p1)
 				{
-					WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
-					CloseHandle(pi.hThread);
-					CloseHandle(pi.hProcess);
-					dwLen=GetFileSize(hReadPipe,NULL);
-					char *buf=new char[dwLen+1];
-					retval=ReadFile(hReadPipe,buf,dwLen,&dwRead,NULL);
-					if (strlen(buf))
+					p1++;
+					char* p2=strchr(p1,'"');
+					if (p2)
 					{
-						char* p1=strchr(buf,'"');
-						if (p1)
-						{
-							p1++;
-							char* p2=strchr(p1,'"');
-							if (p2)
-							{
-								*p2 = 0;
-								strcpy(m_KeyInfo.BSN,p1);
-							}
-						}
+						*p2 = 0;
+						strcpy(m_KeyInfo.SSN,p1);
 					}
-					delete buf;
 				}
-				//----------------------------------------------------------------------
-				retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /ss",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
-				if(retval)
-				{
-					WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
-					CloseHandle(pi.hThread);
-					CloseHandle(pi.hProcess);
-					dwLen=GetFileSize(hReadPipe,NULL);
-					char *buf=new char[dwLen+1];
-					retval=ReadFile(hReadPipe,buf,dwLen,&dwRead,NULL);
-					if (strlen(buf))
-					{
-						char* p1=strchr(buf,'"');
-						if (p1)
-						{
-							p1++;
-							char* p2=strchr(p1,'"');
-							if (p2)
-							{
-								*p2 = 0;
-								strcpy(m_KeyInfo.SSN,p1);
-							}
-						}
-					}
-					delete buf;
-				}
+			}
+			delete buf;
+		}
 #endif
 		strcpy(m_KeyInfo.PKID,m_pkInfo.pkid);
 		strcpy(m_KeyInfo.KEY,m_pkInfo.key);
 
 		CFile fpc;
-		if (fpc.Open(TEXT("oa3tool.cfg"),CFile::modeReadWrite))
+		if (fpc.Open(TEXT("cldtool.cfg"),CFile::modeReadWrite))
 		{
 			char* pDesc, *pFirst, *pEnd;
 			DWORD fLen = fpc.GetLength();
@@ -1016,7 +1045,7 @@ void COa3Dlg::ProcessKeyInjection()
 		iCount = 5;
 		while (iCount-- > 0)
 		{
-			retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=oa3tool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
+			retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=cldtool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
 			WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
 			GetExitCodeProcess(pi.hProcess,&retCode);
 			if (retCode == 0)
@@ -1087,18 +1116,23 @@ __end:
 	GetDlgItem(IDC_ERASE)->EnableWindow();
 	GetDlgItem(IDC_INJECT)->EnableWindow();
 	//GetDlgItem(IDC_SERVIP)->EnableWindow();
+	//if (!((CButton*)GetDlgItem(IDC_GIP))->GetCheck())
+	//{
+	//	GetDlgItem(IDC_SERVIP2)->EnableWindow();
+	//	GetDlgItem(IDC_GIP)->EnableWindow();
+	//}
 	//GetDlgItem(IDC_PWD)->EnableWindow();
 
 }
 
-UINT COa3Dlg::KeyThread(LPVOID lpv)
+UINT CCloudOADlg::KeyThread(LPVOID lpv)
 {
-	COa3Dlg* p = (COa3Dlg*)lpv;
+	CCloudOADlg* p = (CCloudOADlg*)lpv;
 	p->ProcessKeyInjection();
 	return 0;
 }
 
-void COa3Dlg::OnDestroy()
+void CCloudOADlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 	SetCurrentDirectory(m_szTempDir);
@@ -1107,7 +1141,7 @@ void COa3Dlg::OnDestroy()
 	// TODO: Add your message handler code here
 }
 
-void COa3Dlg::OnBnClickedInject()
+void CCloudOADlg::OnBnClickedInject()
 {
 	// TODO: Add your control notification handler code here
 	KillTimer(1);
@@ -1115,22 +1149,26 @@ void COa3Dlg::OnBnClickedInject()
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
 	GetDlgItem(IDC_INJECT)->EnableWindow(0);
 	//GetDlgItem(IDC_SERVIP)->EnableWindow(0);
+	//GetDlgItem(IDC_SERVIP2)->EnableWindow(0);
+	//GetDlgItem(IDC_GIP)->EnableWindow(0);
 	//GetDlgItem(IDC_PWD)->EnableWindow(0);
 	CloseHandle(CreateThread(0,0,(LPTHREAD_START_ROUTINE)KeyThread,this,0,0));
 }
 
-void COa3Dlg::OnBnClickedErase()
+void CCloudOADlg::OnBnClickedErase()
 {
 	// TODO: Add your control notification handler code here
 	GetDlgItem(IDC_CONNECT)->EnableWindow(0);
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
 	GetDlgItem(IDC_INJECT)->EnableWindow(0);
 	//GetDlgItem(IDC_SERVIP)->EnableWindow(0);
+	//GetDlgItem(IDC_SERVIP2)->EnableWindow(0);
+	//GetDlgItem(IDC_GIP)->EnableWindow(0);
 	//GetDlgItem(IDC_PWD)->EnableWindow(0);
 	CloseHandle(CreateThread(0,0,(LPTHREAD_START_ROUTINE)KeyEraseThread,this,0,0));
 }
 
-int COa3Dlg::Reboot()
+int CCloudOADlg::Reboot()
 {
 	HANDLE hToken;
 	TOKEN_PRIVILEGES tkp;
@@ -1144,7 +1182,7 @@ int COa3Dlg::Reboot()
 	return 0;
 }
 
-void COa3Dlg::EraseKey()
+void CCloudOADlg::EraseKey()
 {
 	DWORD retCode;
 	BOOL bHasKey = FALSE;
@@ -1190,26 +1228,51 @@ void COa3Dlg::EraseKey()
 	GetDlgItem(IDC_ERASE)->EnableWindow();
 	GetDlgItem(IDC_INJECT)->EnableWindow();
 	//GetDlgItem(IDC_SERVIP)->EnableWindow();
+	//if (!((CButton*)GetDlgItem(IDC_GIP))->GetCheck())
+	//{
+	//	GetDlgItem(IDC_SERVIP2)->EnableWindow();
+	//	GetDlgItem(IDC_GIP)->EnableWindow();
+	//}
 	//GetDlgItem(IDC_PWD)->EnableWindow();
 }
 
-UINT COa3Dlg::KeyEraseThread(LPVOID lpv)
+UINT CCloudOADlg::KeyEraseThread(LPVOID lpv)
 {
-	COa3Dlg* p = (COa3Dlg*)lpv;
+	CCloudOADlg* p = (CCloudOADlg*)lpv;
 	p->EraseKey();
 	return 0;
 }
 
-void COa3Dlg::OnCancel()
+void CCloudOADlg::OnCancel()
 {
 	// TODO: Add your specialized code here and/or call the base class
 
 	//CDialog::OnCancel();
 }
 
-void COa3Dlg::OnOK()
+void CCloudOADlg::OnOK()
 {
 	// TODO: Add your specialized code here and/or call the base class
 
 	//CDialog::OnOK();
+}
+
+void CCloudOADlg::OnBnClickedGip()
+{
+	// TODO: Add your control notification handler code here
+	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
+	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
+	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
+	DWORD dwIP;
+	ip2->GetAddress(dwIP);
+	m_nCheckIp = pIx->GetCheck();
+	if (m_nCheckIp)
+	{
+		GetDlgItem(IDC_SERVIP)->EnableWindow(0);
+		ip->SetAddress(dwIP);
+	}
+	else
+	{
+		GetDlgItem(IDC_SERVIP)->EnableWindow();
+	}
 }
