@@ -28,6 +28,7 @@ public:
 	SOCKET m_socket;
 	ProductKeyInfo m_pkInfo;
 	KeyInfo m_KeyInfo;
+	char m_szOATool[32];
 
 private:
 	DpkCfg m_cfg;
@@ -41,6 +42,7 @@ public:
 	int Reboot();
 	static UINT KeyEraseThread(LPVOID lpv);
 	void EraseKey();
+	BOOL GetOA3Parameter(char* szCmd, int nIdx);
 #ifdef __MAC
 	BOOL GetDeviceAddress();
 	BOOL GetIMEI();

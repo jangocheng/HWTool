@@ -348,7 +348,6 @@ BOOL CCloudOADlg::OnInitDialog()
 			m_nIndex = m_cfg.idx;
 			m_nCheckIp = m_cfg.nUip;
 			pIx->SetCheck(m_nCheckIp);
-			UpdateData(0);
 			SetDlgItemText(IDC_DATABASE,m_cfg.database);
 			SetDlgItemText(IDC_SELNUMBER,m_cfg.para);
 			SetDlgItemText(IDC_BUSINESS,m_cfg.business);
@@ -482,6 +481,7 @@ BOOL CCloudOADlg::GetProductKey()
 	HANDLE hReadPipe,hWritePipe;
 	DWORD retcode = -1;
 	CFile fp;
+	char szCmd[255]={0};
 
 	SetCurrentDirectory(m_szTempDir);
 	memset(&m_pkInfo,0,sizeof(m_pkInfo));
@@ -526,7 +526,8 @@ BOOL CCloudOADlg::GetProductKey()
 		{
 			goto end;
 		}
-		retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=oa3toolfile.cfg",&sa,&sa,TRUE,0,NULL,0,&si,&pi);
+		sprintf(szCmd,"cmd.exe /c %s /report /configfile=oa3toolfile.cfg",m_szOATool);
+		retval=CreateProcessA(NULL,szCmd,&sa,&sa,TRUE,0,NULL,0,&si,&pi);
 		if(retval)
 		{
 			DWORD dwLen;
@@ -570,6 +571,7 @@ BOOL CCloudOADlg::GetProductKey()
 	HANDLE hReadPipe,hWritePipe;
 	DWORD retcode = -1;
 	CFile fp;
+	char szCmd[255]={0};
 
 	SetCurrentDirectory(m_szTempDir);
 	memset(&m_pkInfo,0,sizeof(m_pkInfo));
@@ -611,7 +613,8 @@ BOOL CCloudOADlg::GetProductKey()
 		{
 			goto end;
 		}
-		retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=oa3toolfile.cfg",&sa,&sa,TRUE,0,NULL,0,&si,&pi);
+		sprintf(szCmd,"cmd.exe /c %s /report /configfile=oa3toolfile.cfg",m_szOATool);
+		retval=CreateProcessA(NULL,szCmd,&sa,&sa,TRUE,0,NULL,0,&si,&pi);
 		if(retval)
 		{
 			DWORD dwLen;
@@ -656,6 +659,7 @@ void CCloudOADlg::ProcessKeyInjection()
 	DWORD len,cnt,cnt2,retCode,dwLen,dwRead;
 	BOOL bHasKey = FALSE,bHasCBR = FALSE,retval;
 	int iCount,iVal;
+	char szCmd[255]={0};
 	PROCESS_INFORMATION pi={0};
 	STARTUPINFOA si={0};
 	SECURITY_ATTRIBUTES sa={0};
@@ -732,7 +736,8 @@ void CCloudOADlg::ProcessKeyInjection()
 	if (!bHasKey)
 	{
 		SetDlgItemText(IDC_STATUS,TEXT("在正从服务器获取KEY......"));
-		retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /assemble /configfile=cldtool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
+		sprintf(szCmd,"cmd.exe /c %s /assemble /configfile=cldtool.cfg",m_szOATool);
+		retval=CreateProcessA(NULL,szCmd,&sa,&sa,0,0,NULL,NULL,&si,&pi);
 		WaitForSingleObject(pi.hThread,INFINITE);
 		GetExitCodeProcess(pi.hProcess,&retCode);
 		if (retCode)
@@ -787,15 +792,15 @@ void CCloudOADlg::ProcessKeyInjection()
 		{
 			char buff[256] = {0};
 			CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
-			if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
+			if (strncmp(pInfo->m_InfoA.dmi_sys_uuid,"00020003000400050006000700080009",32) == 0)
 			{
 				strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
 				GUID guid;
 				CoCreateGuid(&guid);
-				memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
-				sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
-				mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
-				strcat(buff,pInfo->m_BiosInfoA.m_szSU);
+				memset(pInfo->m_InfoA.dmi_sys_uuid,0,sizeof(pInfo->m_InfoA.dmi_sys_uuid));
+				sprintf(pInfo->m_InfoA.dmi_sys_uuid,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+				mbstowcs(pInfo->m_InfoW.dmi_sys_uuid,pInfo->m_InfoA.dmi_sys_uuid,64);
+				strcat(buff,pInfo->m_InfoA.dmi_sys_uuid);
 				strcat(buff,"\"");
 				retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
 				WaitForSingleObject(pi.hThread,INFINITE);
@@ -882,9 +887,10 @@ void CCloudOADlg::ProcessKeyInjection()
 				delete pDesc;
 			}
 			iCount = 5;
+			sprintf(szCmd,"cmd.exe /c %s /report /configfile=cldtool.cfg",m_szOATool);
 			while (iCount-- > 0)
 			{
-				retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=cldtool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
+				retval=CreateProcessA(NULL,szCmd,&sa,&sa,0,0,NULL,NULL,&si,&pi);
 				WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
 				GetExitCodeProcess(pi.hProcess,&retCode);
 				if (retCode == 0)
@@ -951,15 +957,15 @@ void CCloudOADlg::ProcessKeyInjection()
 		{
 			char buff[256] = {0};
 			CBiosInfo* pInfo = ((CHWToolApp*)AfxGetApp())->m_BiosInfo;
-			if (strncmp(pInfo->m_BiosInfoA.m_szSU,"00020003000400050006000700080009",32) == 0)
+			if (strncmp(pInfo->m_InfoA.dmi_sys_uuid,"00020003000400050006000700080009",32) == 0)
 			{
 				strcpy(buff,"cmd.exe /c amidewin.exe /su \"");
 				GUID guid;
 				CoCreateGuid(&guid);
-				memset(pInfo->m_BiosInfoA.m_szSU,0,sizeof(pInfo->m_BiosInfoA.m_szSU));
-				sprintf(pInfo->m_BiosInfoA.m_szSU,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
-				mbstowcs(pInfo->m_BiosInfoW.m_wszSU,pInfo->m_BiosInfoA.m_szSU,64);
-				strcat(buff,pInfo->m_BiosInfoA.m_szSU);
+				memset(pInfo->m_InfoA.dmi_sys_uuid,0,sizeof(pInfo->m_InfoA.dmi_sys_uuid));
+				sprintf(pInfo->m_InfoA.dmi_sys_uuid,"%08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X",guid.Data1,guid.Data2,guid.Data3,guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+				mbstowcs(pInfo->m_InfoW.dmi_sys_uuid,pInfo->m_InfoA.dmi_sys_uuid,64);
+				strcat(buff,pInfo->m_InfoA.dmi_sys_uuid);
 				strcat(buff,"\"");
 				retval=CreateProcessA(NULL,buff,&sa,&sa,0,0,NULL,NULL,&si,&pi);
 				WaitForSingleObject(pi.hThread,INFINITE);
@@ -1043,9 +1049,10 @@ void CCloudOADlg::ProcessKeyInjection()
 		SetDlgItemText(IDC_STATUS,TEXT("正在上传CBR......"));
 
 		iCount = 5;
+		sprintf(szCmd,"cmd.exe /c %s /report /configfile=cldtool.cfg",m_szOATool);
 		while (iCount-- > 0)
 		{
-			retval=CreateProcessA(NULL,"cmd.exe /c oa3tool.exe /report /configfile=cldtool.cfg",&sa,&sa,0,0,NULL,NULL,&si,&pi);
+			retval=CreateProcessA(NULL,szCmd,&sa,&sa,0,0,NULL,NULL,&si,&pi);
 			WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
 			GetExitCodeProcess(pi.hProcess,&retCode);
 			if (retCode == 0)
@@ -1276,3 +1283,10 @@ void CCloudOADlg::OnBnClickedGip()
 		GetDlgItem(IDC_SERVIP)->EnableWindow();
 	}
 }
+
+BOOL CCloudOADlg::GetOA3Parameter(char* szCmd, int nIdx)
+{
+
+	return TRUE;
+}
+

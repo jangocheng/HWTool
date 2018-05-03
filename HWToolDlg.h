@@ -16,6 +16,7 @@ class CHWToolDlg : public CDialog
 public:
 	CHWToolDlg(CWnd* pParent = NULL);	// standard constructor
 	CDialog* m_pDlg[4];
+	CString m_szTitle;
 // Dialog Data
 	enum { IDD = IDD_HWTOOL_DIALOG };
 

@@ -156,10 +156,11 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 IDD_HWTOOL_DIALOG DIALOGEX 0, 0, 332, 212
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST | WS_EX_APPWINDOW
-CAPTION "CloudDis(10.5.0.2)"
+CAPTION "CloudDis(10.5.0.3)"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,0,0,332,14
+    CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,0,0,61,14
+    RTEXT           "",IDC_OSVER,228,1,101,13,SS_CENTERIMAGE | WS_DISABLED
 END
 
 IDD_CFG DIALOGEX 0, 0, 285, 138
@@ -250,8 +251,8 @@ IDR_KEY                 ICON                    "res\\key.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,5,0,2
- PRODUCTVERSION 10,5,0,2
+ FILEVERSION 10,5,0,5
+ PRODUCTVERSION 10,5,0,5
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -268,13 +269,13 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
             VALUE "FileDescription", "Authorized by Kelvin Cheng"
-            VALUE "FileVersion", "10, 5, 0, 2"
+            VALUE "FileVersion", "10, 5, 0, 5"
             VALUE "InternalName", "HWTool.exe"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "LegalTrademarks", "Techvision"
             VALUE "OriginalFilename", "HWTool.exe"
             VALUE "ProductName", "HWTool Application"
-            VALUE "ProductVersion", "10, 5, 0, 2"
+            VALUE "ProductVersion", "10, 5, 0, 5"
         END
     END
     BLOCK "VarFileInfo"

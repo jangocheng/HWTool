@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Dminfo.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HWTool.cpp"
 				>
 			</File>
@@ -266,6 +270,10 @@
 			</File>
 			<File
 				RelativePath=".\DisConfigDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Dminfo.h"
 				>
 			</File>
 			<File
@@ -352,19 +360,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res\byt\fparts.txt"
-			>
-		</File>
-		<File
 			RelativePath=".\res\cht86\fparts.txt"
 			>
 		</File>
 		<File
-			RelativePath=".\res\cht86\fptw.exe"
+			RelativePath=".\res\byt\fparts.txt"
 			>
 		</File>
 		<File
 			RelativePath=".\res\byt\fptw.exe"
+			>
+		</File>
+		<File
+			RelativePath=".\res\cht86\fptw.exe"
 			>
 		</File>
 		<File

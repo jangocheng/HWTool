@@ -27,6 +27,7 @@ public:
 	SOCKET m_socket;
 	ProductKeyInfo m_pkInfo;
 	KeyInfo m_KeyInfo;
+	char m_szOATool[32];
 
 private:
 	DpkCfg m_cfg;

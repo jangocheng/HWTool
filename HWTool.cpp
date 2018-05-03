@@ -9,226 +9,37 @@
 #define new DEBUG_NEW
 #endif
 
+#pragma comment(lib, "version.lib")
 
 CBiosInfo::CBiosInfo()
 {
+	memset(&m_InfoA,0,sizeof(m_InfoA));
+	memset(&m_InfoW,0,sizeof(m_InfoW));
 	RebuildInfo();
 }
 
 void CBiosInfo::RebuildInfo()
 {
-	wchar_t filepath[MAX_PATH] = {0};
-	GetModuleFileName(NULL,filepath,MAX_PATH);
-	(wcsrchr(filepath,TEXT('\\')))[0] = 0;
-	_tcscpy(m_szTempDir,filepath);
-
-	memset(&m_BiosInfoA,0,sizeof(m_BiosInfoA));
-	memset(&m_BiosInfoW,0,sizeof(m_BiosInfoW));
-//*************************************************
-	BOOL retval;
-	PROCESS_INFORMATION pi={0};
-	STARTUPINFOA si={0};
-	SECURITY_ATTRIBUTES sa={0};
-	HANDLE hReadPipe,hWritePipe;
-	//HANDLE hReadInPipe,hWriteInPipe;
-	sa.bInheritHandle=TRUE;
-	sa.nLength=sizeof SECURITY_ATTRIBUTES;
-	sa.lpSecurityDescriptor=NULL;
-	retval=CreatePipe(&hReadPipe,&hWritePipe,&sa,0);
-	//retval = CreatePipe(&hReadInPipe,&hWriteInPipe,&sa,0);
-	//SetHandleInformation(hReadPipe, HANDLE_FLAG_INHERIT, 0);//communication with console, like kbd input.
-	//SetHandleInformation(hWriteInPipe, HANDLE_FLAG_INHERIT, 0);//communication with console, like kbd input.
-	si.cb=sizeof STARTUPINFOA;
-	si.wShowWindow=SW_HIDE;
-	si.dwFlags=STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;
-	si.hStdOutput=si.hStdError=hWritePipe;
-	//si.hStdInput = hReadInPipe;
-	DWORD dwLen,dwRead,retCode=-1;
-	char *buff;
-	CStringA cmd;
-	SetCurrentDirectory(m_szTempDir);
-	//////////////////////////////////////////////////////////////////////
-	retval=CreateProcessA(NULL,"cmd.exe /c amidewin.exe /IVN /IV /ID /SM /SP /SV /SS /SU /SK /SF /BM /BP /BV /BS",&sa,&sa,TRUE,0,NULL,NULL,&si,&pi);
-	//retval=CreateProcessA(NULL,"cmd.exe /c fptw.exe",&sa,&sa,TRUE,CREATE_NEW_CONSOLE,0,0,&si,&pi);
-	//WaitForSingleObject(pi.hThread,1000);
-	WaitForSingleObject(pi.hThread,INFINITE);
-	TerminateThread(pi.hThread,0);
-	TerminateProcess(pi.hProcess,0);
-	GetExitCodeProcess(pi.hProcess,&retCode);
-	CloseHandle(pi.hThread);
-	CloseHandle(pi.hProcess);
-
-	dwLen=GetFileSize(hReadPipe,NULL);
-	buff=new char [dwLen+1];
-	memset(buff,0,dwLen+1);
-	retval=ReadFile(hReadPipe,buff,dwLen,&dwRead,NULL);
-
-	CloseHandle(hWritePipe);
-	CloseHandle(hReadPipe);
-	//CloseHandle(hWriteInPipe);
-	//CloseHandle(hReadInPipe);
-//*************************************************
-	char *szToken,*p1,*p2;
-	szToken = strtok(buff,"\r\n");
-	while (szToken)
-	{
-		if (strncmp(szToken,"(/IVN",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szIVN,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/IV)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szIV,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/ID)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szID,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/SM)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szSM,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/SP)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szSP,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/SV)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szSV,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/SS)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szSS,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/SU)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szSU,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/SK)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szSK,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/SF)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szSF,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/BM)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szBM,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/BP)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szBP,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/BV)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szBV,64,p1+1);
-			}
-		}
-		else if (strncmp(szToken,"(/BS)",5) == 0)
-		{
-			p1 = strchr(szToken,'"');
-			p2 = strrchr(szToken,'"');
-			if (p1 && p2)
-			{
-				*p2 = 0;
-				strcpy_s(m_BiosInfoA.m_szBS,64,p1+1);
-			}
-		}
-		szToken = strtok(NULL,"\r\n");
-	}
-	delete buff;
-	mbstowcs(m_BiosInfoW.m_wszIVN,m_BiosInfoA.m_szIVN,64);
-	mbstowcs(m_BiosInfoW.m_wszIV,m_BiosInfoA.m_szIV,64);
-	mbstowcs(m_BiosInfoW.m_wszID,m_BiosInfoA.m_szID,64);
-	mbstowcs(m_BiosInfoW.m_wszSM,m_BiosInfoA.m_szSM,64);
-	mbstowcs(m_BiosInfoW.m_wszSP,m_BiosInfoA.m_szSP,64);
-	mbstowcs(m_BiosInfoW.m_wszSV,m_BiosInfoA.m_szSV,64);
-	mbstowcs(m_BiosInfoW.m_wszSS,m_BiosInfoA.m_szSS,64);
-	mbstowcs(m_BiosInfoW.m_wszSU,m_BiosInfoA.m_szSU,64);
-	mbstowcs(m_BiosInfoW.m_wszSK,m_BiosInfoA.m_szSK,64);
-	mbstowcs(m_BiosInfoW.m_wszSF,m_BiosInfoA.m_szSF,64);
-	mbstowcs(m_BiosInfoW.m_wszBM,m_BiosInfoA.m_szBM,64);
-	mbstowcs(m_BiosInfoW.m_wszBP,m_BiosInfoA.m_szBP,64);
-	mbstowcs(m_BiosInfoW.m_wszBV,m_BiosInfoA.m_szBV,64);
-	mbstowcs(m_BiosInfoW.m_wszBS,m_BiosInfoA.m_szBS,64);
+	///////////////////////////////////////////////////////////////////
+	CDminfo dminfo;
+	dminfo.GetDMInfo(&m_InfoA);
+	mbstowcs(m_InfoW.dmi_bios_vendor,m_InfoA.dmi_bios_vendor,64);
+	mbstowcs(m_InfoW.dmi_bios_version,m_InfoA.dmi_bios_version,64);
+	mbstowcs(m_InfoW.dmi_bios_release_date,m_InfoA.dmi_bios_release_date,64);
+	mbstowcs(m_InfoW.dmi_sys_manufacture,m_InfoA.dmi_sys_manufacture,64);
+	mbstowcs(m_InfoW.dmi_sys_product,m_InfoA.dmi_sys_product,64);
+	mbstowcs(m_InfoW.dmi_sys_version,m_InfoA.dmi_sys_version,64);
+	mbstowcs(m_InfoW.dmi_sys_serial_number,m_InfoA.dmi_sys_serial_number,64);
+	mbstowcs(m_InfoW.dmi_sys_uuid,m_InfoA.dmi_sys_uuid,64);
+	mbstowcs(m_InfoW.dmi_sys_sku,m_InfoA.dmi_sys_sku,64);
+	mbstowcs(m_InfoW.dmi_sys_family,m_InfoA.dmi_sys_family,64);
+	mbstowcs(m_InfoW.dmi_bsbrd_manufacture,m_InfoA.dmi_bsbrd_manufacture,64);
+	mbstowcs(m_InfoW.dmi_bsbrd_product,m_InfoA.dmi_bsbrd_product,64);
+	mbstowcs(m_InfoW.dmi_bsbrd_version,m_InfoA.dmi_bsbrd_version,64);
+	mbstowcs(m_InfoW.dmi_bsbrd_serial,m_InfoA.dmi_bsbrd_serial,64);
+	mbstowcs(m_InfoW.dmi_chassis_type,m_InfoA.dmi_chassis_type,64);
+	mbstowcs(m_InfoW.dmi_oem_table_id,m_InfoA.dmi_oem_table_id,64);
+	mbstowcs(m_InfoW.dmi_oem_id,m_InfoA.dmi_oem_id,64);
 }
 
 CBiosInfo::~CBiosInfo()
@@ -259,6 +70,57 @@ CHWToolApp::CHWToolApp()
 CHWToolApp theApp;
 
 
+void CHWToolApp::GetVersion(CString &ver)  
+{  
+    DWORD dwInfoSize = 0;  
+    TCHAR exePath[MAX_PATH];  
+    memset(exePath, 0, sizeof(exePath));  
+  
+    ver.Format(_T("V1.00"));  
+  
+    // 得到程序的自身路径  
+    GetModuleFileName(NULL, exePath, sizeof(exePath)/sizeof(TCHAR));  
+  
+    // 判断是否能获取版本号  
+    dwInfoSize = GetFileVersionInfoSize(exePath, NULL);  
+  
+    if (dwInfoSize == 0)  
+    {  
+        ::OutputDebugString(L"GetFileVersionInfoSize fail\r\n");  
+    }  
+    else  
+    {  
+        BYTE* pData = new BYTE[dwInfoSize];  
+  
+        // 获取版本信息  
+        if (!GetFileVersionInfo(exePath, NULL, dwInfoSize, pData))  
+        {  
+            ::OutputDebugString(L"GetFileVersionInfo fail\r\n");  
+        }  
+        else  
+        {  
+            // 查询版本信息中的具体键值  
+            LPVOID lpBuffer;  
+            UINT uLength;  
+            if (!::VerQueryValue((LPCVOID)pData, _T("\\"), &lpBuffer, &uLength))  
+            {  
+                ::OutputDebugString(L"GetFileVersionInfo fail\r\n");  
+            }  
+            else  
+            {  
+                DWORD dwVerMS;  
+                DWORD dwVerLS;  
+                dwVerMS = ((VS_FIXEDFILEINFO*)lpBuffer)->dwProductVersionMS;    
+                dwVerLS = ((VS_FIXEDFILEINFO*)lpBuffer)->dwProductVersionLS;  
+                ver.Format(_T("V%d.%d.%d.%d"), (dwVerMS >> 16), (dwVerMS & 0xFFFF), (dwVerLS >> 16), (dwVerLS & 0xFFFF));  
+            }  
+        }  
+  
+        delete pData;  
+    }  
+}  
+
+
 // CHWToolApp initialization
 
 BOOL CHWToolApp::InitInstance()
@@ -281,11 +143,16 @@ BOOL CHWToolApp::InitInstance()
 		return FALSE;
 	}
 
+	///////////////////////////////////////////////////////////////////
+
+	CString ver,szTitle;
+	GetVersion(ver);
+	szTitle.Format(TEXT("MDOSTool-%s"),ver);
 	AfxEnableControlContainer();
 	m_hMutex=OpenMutex(MUTEX_ALL_ACCESS,FALSE,TEXT("HUIWEITool"));
 	if(m_hMutex)
 	{
-		HWND hWnd=FindWindow(NULL,TEXT("CloudDis(10.5.0.2)"));
+		HWND hWnd=FindWindow(NULL,szTitle);
 		if (hWnd)
 		{
 			if(!IsWindowVisible(hWnd))
@@ -310,6 +177,7 @@ BOOL CHWToolApp::InitInstance()
 	CoInitialize(NULL);
 
 	CHWToolDlg dlg;
+	dlg.m_szTitle = szTitle;
 	m_BiosInfo = new CBiosInfo();
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
