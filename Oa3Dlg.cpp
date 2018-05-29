@@ -696,7 +696,7 @@ void COa3Dlg::ProcessKeyInjection()
 	Sleep(3000);
 	iVal=recv(m_socket,szTmp,1024,0);
 	ul = GetLastError();
-	if (iVal < 1 && strncmp(szTmp,"authorized",iVal))
+	if (iVal < 1 || strncmp(szTmp,"granted", strlen("granted")))
 	{
 		MessageBox(TEXT("服务器授权失败，请确认软件版本是否正确"),TEXT("授权错误"),MB_ICONERROR);
 		goto __end;
@@ -885,20 +885,11 @@ void COa3Dlg::ProcessKeyInjection()
 					m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
 					cnt = 1, cnt2 = 10;
 					len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
-					while (cnt2-->0)
+					if (len != sizeof(KeyInfo))
 					{
-						Sleep(3000);
-						len = recv(m_socket,szTmp,1024,0);
-						if (len > 0)
-						{
-							break;
-						}
-					}
-					if (strncmp(szTmp,"techvision",len))
-					{
-						FILE* fp = fopen("error.log","w");
-						fputs(szTmp,fp);
-						fclose(fp);
+						//FILE* fp = fopen("error.log","w");
+						//fputs(szTmp,fp);
+						//fclose(fp);
 						MessageBox(TEXT("上传收集数据失败！"),TEXT("错误"),MB_ICONERROR);
 						goto __end;
 					}

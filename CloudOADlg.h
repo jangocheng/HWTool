@@ -55,4 +55,5 @@ protected:
 	virtual void OnOK();
 public:
 	afx_msg void OnBnClickedGip();
+	afx_msg void OnIpnFieldchangedServip2(NMHDR *pNMHDR, LRESULT *pResult);
 };

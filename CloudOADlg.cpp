@@ -119,7 +119,7 @@ BOOL CCloudOADlg::GetDeviceAddress()
                 break;
             case IF_TYPE_IEEE80211:
 				{
-					if (strstr((char*)pIfRow->bDescr,"802.11") && !bWIFI)
+					if (strstr((char*)pIfRow->bDescr,"Wireless") && !bWIFI)
 					{
 						sprintf(m_KeyInfo.WIFI,"%02X-%02X-%02X-%02X-%02X-%02X",pIfRow->bPhysAddr[0],
 							pIfRow->bPhysAddr[1],
@@ -207,6 +207,7 @@ BEGIN_MESSAGE_MAP(CCloudOADlg, CDialog)
 	ON_BN_CLICKED(IDC_INJECT, &CCloudOADlg::OnBnClickedInject)
 	ON_BN_CLICKED(IDC_ERASE, &CCloudOADlg::OnBnClickedErase)
 	ON_BN_CLICKED(IDC_GIP, &CCloudOADlg::OnBnClickedGip)
+	ON_NOTIFY(IPN_FIELDCHANGED, IDC_SERVIP2, &CCloudOADlg::OnIpnFieldchangedServip2)
 END_MESSAGE_MAP()
 
 
@@ -724,7 +725,7 @@ void CCloudOADlg::ProcessKeyInjection()
 	Sleep(3000);
 	iVal=recv(m_socket,szTmp,1024,0);
 	ul = GetLastError();
-	if (iVal < 1 && strncmp(szTmp,"authorized",iVal))
+	if (iVal < 1 || strncmp(szTmp,"granted", strlen("granted")))
 	{
 		MessageBox(TEXT("服务器授权失败，请确认软件版本是否正确"),TEXT("授权错误"),MB_ICONERROR);
 		goto __end;
@@ -913,21 +914,12 @@ void CCloudOADlg::ProcessKeyInjection()
 					m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
 					cnt = 1, cnt2 = 10;
 					len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
-					while (cnt2-->0)
+					if (len != sizeof(KeyInfo))
 					{
-						Sleep(3000);
-						len = recv(m_socket,szTmp,1024,0);
-						if (len > 0)
-						{
-							break;
-						}
-					}
-					if (strncmp(szTmp,"techvision",len))
-					{
-						FILE* fp = fopen("error.log","w");
-						fputs(szTmp,fp);
-						fclose(fp);
-						MessageBox(TEXT("上传收集数据失败！"),TEXT("错误"),MB_ICONERROR);
+						//FILE* fp = fopen("error.log","w");
+						//fputs(szTmp,fp);
+						//fclose(fp);
+						MessageBox(TEXT("上传收集数据失败！"), TEXT("错误"), MB_ICONERROR);
 						goto __end;
 					}
 				}
@@ -1080,24 +1072,14 @@ void CCloudOADlg::ProcessKeyInjection()
 				m_KeyInfo.CRC = CRC32(0xFFFFFFFF,(BYTE*)&m_KeyInfo,len);
 				cnt = 1, cnt2 = 10;
 				len = send(m_socket,(char*)&m_KeyInfo,sizeof(KeyInfo),0);
-				while (cnt2-->0)
+				if (len != sizeof(KeyInfo))
 				{
-					Sleep(3000);
-					len = recv(m_socket,szTmp,1024,0);
-					if (len > 0)
-					{
-						break;
-					}
-				}
-				if (strncmp(szTmp,"techvision",len))
-				{
-					FILE* fp = fopen("error.log","w");
-					fputs(szTmp,fp);
-					fclose(fp);
+					//FILE* fp = fopen("error.log","w");
+					//fputs(szTmp,fp);
+					//fclose(fp);
 					MessageBox(TEXT("上传收集数据失败！"),TEXT("错误"),MB_ICONERROR);
 					goto __end;
 				}
-
 			}
 			else
 			{
@@ -1290,3 +1272,19 @@ BOOL CCloudOADlg::GetOA3Parameter(char* szCmd, int nIdx)
 	return TRUE;
 }
 
+void CCloudOADlg::OnIpnFieldchangedServip2(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
+	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
+	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
+	DWORD dwIP;
+	ip2->GetAddress(dwIP);
+	m_nCheckIp = pIx->GetCheck();
+	if (m_nCheckIp)
+	{
+		ip->SetAddress(dwIP);
+	}
+	*pResult = 0;
+}

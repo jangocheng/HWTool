@@ -133,6 +133,11 @@ BOOL CHWToolDlg::OnInitDialog()
 		strcat(szCmdTool,"rs3_");
 		wcscat(szOSInfo,TEXT("RS3 "));
 	}
+	else if (!strcmp(szVer,"17134"))
+	{
+		strcat(szCmdTool,"rs4_");
+		wcscat(szOSInfo,TEXT("RS4 "));
+	}
 	else
 	{
 		strcat(szCmdTool,"rs2_");

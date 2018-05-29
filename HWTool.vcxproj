@@ -14,6 +14,7 @@
     <ProjectGuid>{96BD2B28-49DF-4FE0-8C54-837C5811777E}</ProjectGuid>
     <RootNamespace>HWTool</RootNamespace>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -100,13 +101,13 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <OutputFile>$(OutDir)CloudDis.exe</OutputFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <OutputFile>$(OutDir)CloudDis.exe</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -150,29 +151,10 @@
     <ResourceCompile Include="HWTool.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\ami\afuwin.exe" />
-    <None Include="res\ami\amidewin.exe" />
-    <None Include="res\ami\amifldrv32.sys" />
-    <None Include="res\ami\amifldrv64.sys" />
-    <None Include="res\ami\Check.exe" />
-    <None Include="res\ami\oa3tool.exe" />
-    <None Include="res\ami\OA3ToolFile.cfg" />
-    <None Include="res\byt\fptw.exe" />
-    <None Include="res\byt\Idrvdll.dll" />
-    <None Include="res\byt\Pmxdll.dll" />
-    <None Include="res\cht64\fptw64.exe" />
-    <None Include="res\cht64\idrvdll32e.DLL" />
-    <None Include="res\cht64\pmxdll32e.DLL" />
-    <None Include="res\cht86\fptw.exe" />
     <None Include="res\HWTool.rc2" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
-    <Text Include="res\byt\fparts.txt" />
-    <Text Include="res\cht86\fparts.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Manifest Include="uac.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
