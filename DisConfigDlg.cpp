@@ -24,6 +24,10 @@ CDisConfigDlg::CDisConfigDlg(DpkCfg* pCfg, int nType, CWnd* pParent /*=NULL*/)
 	m_nIndex = 0;
 	m_pCfg = pCfg;
 	m_nType = nType;
+	m_ConfigurationList.RemoveAll();
+	m_ParaLicList.RemoveAll();
+	m_ParaOemPOList.RemoveAll();
+	m_ParaOemPartList.RemoveAll();
 	try
 	{
 		m_pConn.CreateInstance(__uuidof(Connection));
@@ -613,7 +617,8 @@ int CDisConfigDlg::BuildParameter()
 	UpdateData(FALSE);
 	sel = pBox->GetCurSel();
 
-	if (m_nType == 1)
+	pBox->GetLBText(sel,lbText);
+	if (sel != -1)//business selection is valid
 	{
 		switch (m_pCfg->idx)
 		{
@@ -622,7 +627,7 @@ int CDisConfigDlg::BuildParameter()
 			while (pos)
 			{
 				paraIndex = m_ParaLicList.GetNext(pos);
-				if (wcslen(paraIndex.Parameter))
+				if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
 				{
 					pSelBox->AddString(paraIndex.Parameter);
 				}
@@ -644,7 +649,7 @@ int CDisConfigDlg::BuildParameter()
 			while (pos)
 			{
 				paraIndex = m_ParaOemPOList.GetNext(pos);
-				if (wcslen(paraIndex.Parameter))
+				if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
 				{
 					pSelBox->AddString(paraIndex.Parameter);
 				}
@@ -666,7 +671,7 @@ int CDisConfigDlg::BuildParameter()
 			while (pos)
 			{
 				paraIndex = m_ParaOemPartList.GetNext(pos);
-				if (wcslen(paraIndex.Parameter))
+				if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
 				{
 					pSelBox->AddString(paraIndex.Parameter);
 				}
@@ -685,84 +690,6 @@ int CDisConfigDlg::BuildParameter()
 			break;
 		default:
 			break;
-		}
-	}
-	else if (m_nType == 0)
-	{
-		pBox->GetLBText(sel,lbText);
-		if (sel != -1)//business selection is valid
-		{
-			switch (m_pCfg->idx)
-			{
-			case 0:
-				pos = m_ParaLicList.GetHeadPosition();
-				while (pos)
-				{
-					paraIndex = m_ParaLicList.GetNext(pos);
-					if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
-					{
-						pSelBox->AddString(paraIndex.Parameter);
-					}
-				}
-				count = pSelBox->GetCount();
-				pSelBox->SetCurSel(0);
-				for (int i=0;i<count;i++)
-				{
-					pSelBox->GetLBText(i,lbText);
-					if (lbText.Compare(m_pCfg->para) == 0)
-					{
-						pSelBox->SetCurSel(i);
-						break;
-					}
-				}
-				break;
-			case 1:
-				pos = m_ParaOemPOList.GetHeadPosition();
-				while (pos)
-				{
-					paraIndex = m_ParaOemPOList.GetNext(pos);
-					if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
-					{
-						pSelBox->AddString(paraIndex.Parameter);
-					}
-				}
-				count = pSelBox->GetCount();
-				pSelBox->SetCurSel(0);
-				for (int i=0;i<count;i++)
-				{
-					pSelBox->GetLBText(i,lbText);
-					if (lbText.Compare(m_pCfg->para) == 0)
-					{
-						pSelBox->SetCurSel(i);
-						break;
-					}
-				}
-				break;
-			case 2:
-				pos = m_ParaOemPartList.GetHeadPosition();
-				while (pos)
-				{
-					paraIndex = m_ParaOemPartList.GetNext(pos);
-					if (wcscmp(paraIndex.Name,lbText) == 0 && wcslen(paraIndex.Parameter))
-					{
-						pSelBox->AddString(paraIndex.Parameter);
-					}
-				}
-				count = pSelBox->GetCount();
-				pSelBox->SetCurSel(0);
-				for (int i=0;i<count;i++)
-				{
-					pSelBox->GetLBText(i,lbText);
-					if (lbText.Compare(m_pCfg->para) == 0)
-					{
-						pSelBox->SetCurSel(i);
-						break;
-					}
-				}
-				break;
-			default:
-				break;
-			}
 		}
 	}
 	return 0;

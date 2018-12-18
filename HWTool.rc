@@ -95,8 +95,7 @@ IDD_CLOUDOADLG DIALOGEX 0, 0, 332, 200
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    CONTROL         "",IDC_SERVIP2,"SysIPAddress32",WS_TABSTOP,48,24,96,12
-    CONTROL         "",IDC_SERVIP,"SysIPAddress32",WS_TABSTOP,221,24,96,12
+    CONTROL         "",IDC_SERVIP,"SysIPAddress32",WS_TABSTOP,48,24,96,12
     EDITTEXT        IDC_DATABASE,48,40,96,13,ES_AUTOHSCROLL
     EDITTEXT        IDC_PWD,174,40,78,13,ES_PASSWORD | ES_AUTOHSCROLL
     CONTROL         "LicensablePart",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,27,75,62,10
@@ -119,16 +118,42 @@ BEGIN
     GROUPBOX        "KEY配置信息",-1,2,58,327,94
     GROUPBOX        "服务器选项",-1,2,12,327,45
     PUSHBUTTON      "配置",IDC_CONNECT,268,39,50,15
-    RTEXT           "数据库IP:",-1,179,26,38,8
+    RTEXT           "数据库IP:",-1,5,26,38,8
     RTEXT           "密码:",-1,150,42,21,8
     LTEXT           "Product Key ID:",-1,16,163,52,8
     EDITTEXT        IDC_PKID,70,161,108,12,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "擦除Key",IDC_ERASE,195,160,50,15
     PUSHBUTTON      "烧写Key",IDC_INJECT,264,160,50,15
     LTEXT           "",IDC_STATUS,0,185,331,12,SS_SUNKEN
-    RTEXT           "服务器IP:",-1,1,26,42,8
     RTEXT           "数据库名:",-1,5,43,38,8
-    CONTROL         "共IP",IDC_GIP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,149,26,28,10
+    EDITTEXT        IDC_KEYPORT,174,23,78,13,ES_AUTOHSCROLL | ES_NUMBER
+    RTEXT           "端口:",-1,150,26,21,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CLOUDOADLG, DIALOG
+    BEGIN
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_CLOUDOADLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 #endif    // 非特定语言(系统默认值) resources
@@ -154,7 +179,7 @@ CAPTION "CloudDis(10.5.0.3)"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,0,0,61,14
-    RTEXT           "",IDC_OSVER,228,1,101,13,SS_CENTERIMAGE | WS_DISABLED
+    RTEXT           "",IDC_OSVER,73,1,256,13,SS_CENTERIMAGE | WS_DISABLED
 END
 
 IDD_CFG DIALOGEX 0, 0, 285, 138
@@ -188,6 +213,25 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "正在连接，请稍候......",IDC_STATIC,1,7,81,8
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_HWTOOL_DIALOG, DIALOG
+    BEGIN
+    END
+
+    IDD_CFG, DIALOG
+    BEGIN
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 
 #ifdef APSTUDIO_INVOKED
@@ -250,8 +294,8 @@ IDR_KEY                 ICON                    "res\\key.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,5,0,6
- PRODUCTVERSION 10,5,0,6
+ FILEVERSION 10,5,16299,3
+ PRODUCTVERSION 10,5,16299,3
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -268,13 +312,13 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
             VALUE "FileDescription", "Authorized by Kelvin Cheng"
-            VALUE "FileVersion", "10.5.0.6"
+            VALUE "FileVersion", "10.5.16299.3"
             VALUE "InternalName", "HWTool.exe"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "LegalTrademarks", "Techvision"
             VALUE "OriginalFilename", "HWTool.exe"
             VALUE "ProductName", "HWTool Application"
-            VALUE "ProductVersion", "10.5.0.6"
+            VALUE "ProductVersion", "10.5.16299.3"
         END
     END
     BLOCK "VarFileInfo"
@@ -301,6 +345,17 @@ BEGIN
 0x6f54, 0x6375, 0x0068, 
     IDC_TOUCH, 0x403, 10, 0
 0x6f4e, 0x2d6e, 0x6f74, 0x6375, 0x0068, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_HWTOOL_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
     0
 END
 

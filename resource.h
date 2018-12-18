@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by HWTool.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 HWTool.rc 使用
 //
 #define IDD_HWTOOL_DIALOG               102
 #define IDP_SOCKETS_INIT_FAILED         103
@@ -36,6 +36,8 @@
 #define IDC_SERVIP2                     1035
 #define IDC_DATABASE                    1036
 #define IDC_GIP                         1037
+#define IDC_DATABASE2                   1037
+#define IDC_KEYPORT                     1037
 #define IDC_OA3                         1038
 #define IDC_RADIO5                      1039
 #define IDC_CLOUDOA                     1039
@@ -45,7 +47,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        159
+#define _APS_NEXT_RESOURCE_VALUE        161
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           101

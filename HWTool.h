@@ -71,7 +71,8 @@ public:
 // Overrides
 	public:
 	virtual BOOL InitInstance();
-	void GetVersion(CString &ver);
+	void GetVersion(LPCTSTR szPEFile, CString &ver);
+	void GetVersion(LPCTSTR szPEFile, LPDWORD pVer);
 
 // Implementation
 

@@ -16,7 +16,7 @@ const char* szCloudKeyString[3] =
 	"OEMPONumber",
 	"OEMPartNumber"
 };
-
+#if 0
 const char* strCloudOATool = 
 {
 "<?xml version=\"1.0\"?>\r\n\
@@ -63,6 +63,54 @@ const char* strCloudOATool =
   </OutputData>\r\n\
 </OA3>\r\n"
 };
+#else
+const char* strCloudOATool =
+{
+	"<?xml version=\"1.0\"?>\r\n\
+<OA3 xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\r\n\
+  <ServerBased>\r\n\
+    <KeyProviderServerLocation>\r\n\
+      <IPAddress>%s</IPAddress>\r\n\
+      <ProtocolSequence>ncacn_ip_tcp</ProtocolSequence>\r\n\
+      <EndPoint>%d</EndPoint>\r\n\
+      <Options />\r\n\
+    </KeyProviderServerLocation>\r\n\
+    <Parameters>\r\n\
+      <Parameter name=\"%s\" value=\"%s\" />\r\n\
+      <BusinessID>%s</BusinessID>\r\n\
+      <OEMOptionalInfo>\r\n\
+        <Field>\r\n\
+          <Name>ZPC_MODEL_SKU</Name>\r\n\
+          <Value>%s</Value>\r\n\
+        </Field>\r\n\
+        <Field>\r\n\
+          <Name>ZFRM_FACTOR_CL1</Name>\r\n\
+          <Value>%s</Value>\r\n\
+        </Field>\r\n\
+        <Field>\r\n\
+          <Name>ZFRM_FACTOR_CL2</Name>\r\n\
+          <Value>%s</Value>\r\n\
+        </Field>\r\n\
+        <Field>\r\n\
+          <Name>ZSCREEN_SIZE</Name>\r\n\
+          <Value>%s</Value>\r\n\
+        </Field>\r\n\
+        <Field>\r\n\
+          <Name>ZTOUCH_SCREEN</Name>\r\n\
+          <Value>%s</Value>\r\n\
+        </Field>\r\n\
+      </OEMOptionalInfo>\r\n\
+      <TrackingInfo>%s</TrackingInfo>\r\n\
+      <SerialNumber>%s</SerialNumber>\r\n\
+    </Parameters>\r\n\
+  </ServerBased>\r\n\
+  <OutputData>\r\n\
+    <AssembledBinaryFile>OA3.bin</AssembledBinaryFile>\r\n\
+    <ReportedXMLFile>OA3.xml</ReportedXMLFile>\r\n\
+  </OutputData>\r\n\
+</OA3>\r\n"
+};
+#endif
 
 #ifdef __MAC
 
@@ -206,8 +254,6 @@ BEGIN_MESSAGE_MAP(CCloudOADlg, CDialog)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_INJECT, &CCloudOADlg::OnBnClickedInject)
 	ON_BN_CLICKED(IDC_ERASE, &CCloudOADlg::OnBnClickedErase)
-	ON_BN_CLICKED(IDC_GIP, &CCloudOADlg::OnBnClickedGip)
-	ON_NOTIFY(IPN_FIELDCHANGED, IDC_SERVIP2, &CCloudOADlg::OnIpnFieldchangedServip2)
 END_MESSAGE_MAP()
 
 
@@ -217,7 +263,6 @@ void CCloudOADlg::OnBnClickedConnect()
 {
 	// TODO: Add your control notification handler code here
 	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);//database
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);//kmt server
 	BYTE szIP[4];
 	char szCfg[2048] = {0};
 	CWaitDlg wDlg;
@@ -227,17 +272,18 @@ void CCloudOADlg::OnBnClickedConnect()
 	ip->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
 	CDisConfigDlg Dlg(&m_cfg,1);
-	ip2->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 	if (szIP[0] == 0)
 	{
 		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
 		goto end;
 	}
-	if (szIP[0] == 0)
+	m_cfg.port = GetDlgItemInt(IDC_KEYPORT,0,0);
+	if (m_cfg.port <= 0)
 	{
-		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
+		MessageBox(TEXT("Key服务器的端口号"), TEXT("错误"), MB_ICONERROR);
 		goto end;
 	}
+
 	GetDlgItemText(IDC_DATABASE,m_cfg.database,32);
 	if (wcslen(m_cfg.database) == 0)
 	{
@@ -250,8 +296,6 @@ void CCloudOADlg::OnBnClickedConnect()
 		MessageBox(TEXT("请输入密码"),TEXT("错误"),MB_ICONERROR);
 		goto end;
 	}
-	wsprintf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
-	m_cfg.nUip = m_nCheckIp;
 	wDlg.Create(IDD_WAITDLG,this);
 	wDlg.SetWindowPos(&CWnd::wndTopMost,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
 	wDlg.CenterWindow(this);
@@ -293,7 +337,7 @@ void CCloudOADlg::OnBnClickedConnect()
 		SetDlgItemText(IDC_TOUCH,m_cfg.hastouch);
 
 		/////////////////////////////////////////////
-		wcstombs(m_szIP,m_cfg.ip2,32);
+		wcstombs(m_szIP, m_cfg.ip, 32);
 		strcpy(m_szPara,szCloudKeyString[m_cfg.idx]);
 		wcstombs(m_szParaValue,m_cfg.para,32);
 		wcstombs(m_szSKU,m_cfg.sku,32);
@@ -308,7 +352,7 @@ void CCloudOADlg::OnBnClickedConnect()
 		(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 		wcscat(filepath,TEXT("cldtool.cfg"));
 		fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-		sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN,m_szCloud);
+		sprintf(szCfg,strCloudOATool,m_szIP,m_cfg.port,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
 		fp.Write(szCfg,(UINT)strlen(szCfg));
 		fp.Close();
 	}
@@ -328,8 +372,6 @@ BOOL CCloudOADlg::OnInitDialog()
 	char szCfg[2048] = {0};
 	UINT szIP[4];
 	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
-	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
 
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2,2),&wsa);
@@ -347,8 +389,6 @@ BOOL CCloudOADlg::OnInitDialog()
 		{
 			fp.Close();
 			m_nIndex = m_cfg.idx;
-			m_nCheckIp = m_cfg.nUip;
-			pIx->SetCheck(m_nCheckIp);
 			SetDlgItemText(IDC_DATABASE,m_cfg.database);
 			SetDlgItemText(IDC_SELNUMBER,m_cfg.para);
 			SetDlgItemText(IDC_BUSINESS,m_cfg.business);
@@ -356,7 +396,8 @@ BOOL CCloudOADlg::OnInitDialog()
 			SetDlgItemText(IDC_TYPE,m_cfg.maintype);
 			SetDlgItemText(IDC_SUBTYPE,m_cfg.subtype);
 			SetDlgItemText(IDC_SCREEN,m_cfg.screensize);
-			SetDlgItemText(IDC_TOUCH,m_cfg.hastouch);
+			SetDlgItemText(IDC_TOUCH, m_cfg.hastouch);
+			SetDlgItemInt(IDC_KEYPORT, m_cfg.port,0);
 			int len=_tcslen(m_cfg.password);
 			for (int i=0;i<len;i++)
 			{
@@ -365,18 +406,9 @@ BOOL CCloudOADlg::OnInitDialog()
 			SetDlgItemText(IDC_PWD,m_cfg.password);
 			swscanf(m_cfg.ip,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
 			ip->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
-			if (!m_nCheckIp)
-			{
-				swscanf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
-				ip->EnableWindow();
-			}
-			else
-			{
-				ip->EnableWindow(0);
-			}
-			ip2->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
+			//ip->EnableWindow(0);
 			/////////////////////////////////////////////////
-			wcstombs(m_szIP,m_cfg.ip2,32);
+			wcstombs(m_szIP, m_cfg.ip, 32);
 			strcpy(m_szPara,szCloudKeyString[m_cfg.idx]);
 			wcstombs(m_szParaValue,m_cfg.para,32);
 			wcstombs(m_szSKU,m_cfg.sku,32);
@@ -391,7 +423,7 @@ BOOL CCloudOADlg::OnInitDialog()
 			(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 			wcscat(filepath,TEXT("cldtool.cfg"));
 			fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-			sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN,m_szCloud);
+			sprintf(szCfg,strCloudOATool,m_szIP,m_cfg.port,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
 			fp.Write(szCfg,(UINT)strlen(szCfg));
 			fp.Close();
 			//SetCurrentDirectory(m_szTempDir);
@@ -1246,45 +1278,8 @@ void CCloudOADlg::OnOK()
 	//CDialog::OnOK();
 }
 
-void CCloudOADlg::OnBnClickedGip()
-{
-	// TODO: Add your control notification handler code here
-	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
-	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
-	DWORD dwIP;
-	ip2->GetAddress(dwIP);
-	m_nCheckIp = pIx->GetCheck();
-	if (m_nCheckIp)
-	{
-		GetDlgItem(IDC_SERVIP)->EnableWindow(0);
-		ip->SetAddress(dwIP);
-	}
-	else
-	{
-		GetDlgItem(IDC_SERVIP)->EnableWindow();
-	}
-}
-
 BOOL CCloudOADlg::GetOA3Parameter(char* szCmd, int nIdx)
 {
 
 	return TRUE;
-}
-
-void CCloudOADlg::OnIpnFieldchangedServip2(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
-	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
-	DWORD dwIP;
-	ip2->GetAddress(dwIP);
-	m_nCheckIp = pIx->GetCheck();
-	if (m_nCheckIp)
-	{
-		ip->SetAddress(dwIP);
-	}
-	*pResult = 0;
 }

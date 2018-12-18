@@ -70,17 +70,27 @@ CHWToolApp::CHWToolApp()
 CHWToolApp theApp;
 
 
-void CHWToolApp::GetVersion(CString &ver)  
+void CHWToolApp::GetVersion(LPCTSTR szPEFile, CString &ver)
 {  
     DWORD dwInfoSize = 0;  
     TCHAR exePath[MAX_PATH];  
     memset(exePath, 0, sizeof(exePath));  
   
     ver.Format(_T("V1.00"));  
+	if (szPEFile == NULL)
+	{
+		// 得到程序的自身路径  
+		GetModuleFileName(NULL, exePath, sizeof(exePath)/sizeof(TCHAR));  
+	}
+	else
+	{
+		wcscpy_s(exePath, szPEFile);
+	}
   
-    // 得到程序的自身路径  
-    GetModuleFileName(NULL, exePath, sizeof(exePath)/sizeof(TCHAR));  
-  
+	if (_waccess(exePath, 0) == -1)
+	{
+		return;
+	}
     // 判断是否能获取版本号  
     dwInfoSize = GetFileVersionInfoSize(exePath, NULL);  
   
@@ -120,6 +130,69 @@ void CHWToolApp::GetVersion(CString &ver)
     }  
 }  
 
+void CHWToolApp::GetVersion(LPCTSTR szPEFile, LPDWORD pVer)
+{
+	DWORD dwInfoSize = 0;
+	TCHAR exePath[MAX_PATH];
+	memset(exePath, 0, sizeof(exePath));
+
+	if (szPEFile == NULL)
+	{
+		// 得到程序的自身路径  
+		GetModuleFileName(NULL, exePath, sizeof(exePath) / sizeof(TCHAR));
+	}
+	else
+	{
+		wcscpy_s(exePath, szPEFile);
+	}
+
+	if (_waccess(exePath, 0) == -1)
+	{
+		return;
+	}
+	if (pVer == NULL)
+	{
+		return;
+	}
+	// 判断是否能获取版本号  
+	dwInfoSize = GetFileVersionInfoSize(exePath, NULL);
+
+	if (dwInfoSize == 0)
+	{
+		::OutputDebugString(L"GetFileVersionInfoSize fail\r\n");
+	}
+	else
+	{
+		BYTE* pData = new BYTE[dwInfoSize];
+
+		// 获取版本信息  
+		if (!GetFileVersionInfo(exePath, NULL, dwInfoSize, pData))
+		{
+			::OutputDebugString(L"GetFileVersionInfo fail\r\n");
+		}
+		else
+		{
+			// 查询版本信息中的具体键值  
+			LPVOID lpBuffer;
+			UINT uLength;
+			if (!::VerQueryValue((LPCVOID)pData, _T("\\"), &lpBuffer, &uLength))
+			{
+				::OutputDebugString(L"GetFileVersionInfo fail\r\n");
+			}
+			else
+			{
+				DWORD dwVerMS;
+				DWORD dwVerLS;
+				dwVerMS = ((VS_FIXEDFILEINFO*)lpBuffer)->dwProductVersionMS;
+				dwVerLS = ((VS_FIXEDFILEINFO*)lpBuffer)->dwProductVersionLS;
+				*pVer = (dwVerLS >> 16);
+			}
+		}
+
+		delete pData;
+	}
+}
+
 
 // CHWToolApp initialization
 
@@ -146,8 +219,8 @@ BOOL CHWToolApp::InitInstance()
 	///////////////////////////////////////////////////////////////////
 
 	CString ver,szTitle;
-	GetVersion(ver);
-	szTitle.Format(TEXT("MDOSTool-%s"),ver);
+	GetVersion(0,ver);
+	szTitle.Format(TEXT("MSC-%s"),ver);
 	AfxEnableControlContainer();
 	m_hMutex=OpenMutex(MUTEX_ALL_ACCESS,FALSE,TEXT("HUIWEITool"));
 	if(m_hMutex)
