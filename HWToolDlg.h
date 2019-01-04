@@ -3,7 +3,6 @@
 
 #pragma once
 #include "CpuInfo.h"
-#include "Oa3Dlg.h"
 #include "CloudOaDlg.h"
 
 #pragma warning(disable:4996)
@@ -27,12 +26,12 @@ public:
 // Implementation
 protected:
 	HICON m_hIcon;
-	CTabCtrl* m_pTab;
+	CFont m_cFont;
 	CImageList m_ImgList;
 	HICON m_hIconFw,m_hIconSn,m_hIconKey,m_hIconOa;
-	COa3Dlg m_OaDlg;
 	CCloudOADlg m_CloudOADlg;
 	TCHAR  m_szINI[MAX_PATH];
+	int m_iOSVer, m_iToolVer;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
@@ -40,7 +39,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult);
+	BOOL IsAllowPerformed();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnDestroy();
 };

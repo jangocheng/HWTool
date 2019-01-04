@@ -72,7 +72,7 @@ const char* strCloudOATool =
     <KeyProviderServerLocation>\r\n\
       <IPAddress>%s</IPAddress>\r\n\
       <ProtocolSequence>ncacn_ip_tcp</ProtocolSequence>\r\n\
-      <EndPoint>%d</EndPoint>\r\n\
+      <EndPoint>9011</EndPoint>\r\n\
       <Options />\r\n\
     </KeyProviderServerLocation>\r\n\
     <Parameters>\r\n\
@@ -262,12 +262,17 @@ END_MESSAGE_MAP()
 void CCloudOADlg::OnBnClickedConnect()
 {
 	// TODO: Add your control notification handler code here
+	CHWToolDlg* pDlg = (CHWToolDlg*)GetParent();
+	//if (!pDlg->IsAllowPerformed())
+	//{
+	//	MessageBox(TEXT("系统版本与刷KEY工具版本不符，请使用与系统一致的工具版本!"), TEXT("版本错误"), MB_ICONERROR);
+	//	return;
+	//}
 	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);//database
 	BYTE szIP[4];
 	char szCfg[2048] = {0};
 	CWaitDlg wDlg;
 	GetDlgItem(IDC_CONNECT)->EnableWindow(0);
-	GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow(0);
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_DISABLED);
 	ip->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
@@ -275,25 +280,6 @@ void CCloudOADlg::OnBnClickedConnect()
 	if (szIP[0] == 0)
 	{
 		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
-		goto end;
-	}
-	m_cfg.port = GetDlgItemInt(IDC_KEYPORT,0,0);
-	if (m_cfg.port <= 0)
-	{
-		MessageBox(TEXT("Key服务器的端口号"), TEXT("错误"), MB_ICONERROR);
-		goto end;
-	}
-
-	GetDlgItemText(IDC_DATABASE,m_cfg.database,32);
-	if (wcslen(m_cfg.database) == 0)
-	{
-		MessageBox(TEXT("请输入数据库名"),TEXT("错误"),MB_ICONERROR);
-		goto end;
-	}
-	GetDlgItemText(IDC_PWD,m_cfg.password,32);
-	if (wcslen(m_cfg.password) == 0)
-	{
-		MessageBox(TEXT("请输入密码"),TEXT("错误"),MB_ICONERROR);
 		goto end;
 	}
 	wDlg.Create(IDD_WAITDLG,this);
@@ -352,13 +338,12 @@ void CCloudOADlg::OnBnClickedConnect()
 		(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 		wcscat(filepath,TEXT("cldtool.cfg"));
 		fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-		sprintf(szCfg,strCloudOATool,m_szIP,m_cfg.port,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
+		sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
 		fp.Write(szCfg,(UINT)strlen(szCfg));
 		fp.Close();
 	}
 end:
 	GetDlgItem(IDC_CONNECT)->EnableWindow();
-	GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 }
 
@@ -389,7 +374,6 @@ BOOL CCloudOADlg::OnInitDialog()
 		{
 			fp.Close();
 			m_nIndex = m_cfg.idx;
-			SetDlgItemText(IDC_DATABASE,m_cfg.database);
 			SetDlgItemText(IDC_SELNUMBER,m_cfg.para);
 			SetDlgItemText(IDC_BUSINESS,m_cfg.business);
 			SetDlgItemText(IDC_MODEL,m_cfg.sku);
@@ -397,7 +381,6 @@ BOOL CCloudOADlg::OnInitDialog()
 			SetDlgItemText(IDC_SUBTYPE,m_cfg.subtype);
 			SetDlgItemText(IDC_SCREEN,m_cfg.screensize);
 			SetDlgItemText(IDC_TOUCH, m_cfg.hastouch);
-			SetDlgItemInt(IDC_KEYPORT, m_cfg.port,0);
 			int len=_tcslen(m_cfg.password);
 			for (int i=0;i<len;i++)
 			{
@@ -423,7 +406,7 @@ BOOL CCloudOADlg::OnInitDialog()
 			(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 			wcscat(filepath,TEXT("cldtool.cfg"));
 			fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-			sprintf(szCfg,strCloudOATool,m_szIP,m_cfg.port,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
+			sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
 			fp.Write(szCfg,(UINT)strlen(szCfg));
 			fp.Close();
 			//SetCurrentDirectory(m_szTempDir);
@@ -1165,6 +1148,12 @@ void CCloudOADlg::OnDestroy()
 void CCloudOADlg::OnBnClickedInject()
 {
 	// TODO: Add your control notification handler code here
+	CHWToolDlg* pDlg = (CHWToolDlg*)GetParent();
+	if (!pDlg->IsAllowPerformed())
+	{
+		MessageBox(TEXT("系统版本与刷KEY工具版本不符，请使用与系统一致的工具版本!"), TEXT("版本错误"), MB_ICONERROR);
+		return;
+	}
 	KillTimer(1);
 	GetDlgItem(IDC_CONNECT)->EnableWindow(0);
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
@@ -1179,6 +1168,12 @@ void CCloudOADlg::OnBnClickedInject()
 void CCloudOADlg::OnBnClickedErase()
 {
 	// TODO: Add your control notification handler code here
+	CHWToolDlg* pDlg = (CHWToolDlg*)GetParent();
+	if (!pDlg->IsAllowPerformed())
+	{
+		MessageBox(TEXT("系统版本与刷KEY工具版本不符，请使用与系统一致的工具版本!"), TEXT("版本错误"), MB_ICONERROR);
+		return;
+	}
 	GetDlgItem(IDC_CONNECT)->EnableWindow(0);
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
 	GetDlgItem(IDC_INJECT)->EnableWindow(0);

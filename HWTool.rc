@@ -13,154 +13,6 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-LANGUAGE LANG_CHINESE, SUBLANG_NEUTRAL
-#pragma code_page(936)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_OADLG DIALOGEX 0, 0, 332, 200
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x0
-BEGIN
-    CONTROL         "",IDC_SERVIP,"SysIPAddress32",WS_TABSTOP,49,31,96,12
-    EDITTEXT        IDC_PWD,174,31,78,13,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "LicensablePart",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,27,75,62,10
-    CONTROL         "OEMPO",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,94,75,40,10
-    CONTROL         "OEMPart",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,139,75,44,10
-    EDITTEXT        IDC_SELNUMBER,194,73,120,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_BUSINESS,59,95,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_MODEL,235,95,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_TYPE,59,113,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_SUBTYPE,235,113,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_SCREEN,59,131,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_TOUCH,235,131,78,12,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "业务名称:",-1,17,98,36,8
-    LTEXT           "外观类型:",-1,17,115,36,8
-    LTEXT           "屏幕尺寸:",-1,17,132,36,8
-    LTEXT           "机器型号:",-1,194,98,36,8
-    LTEXT           "外观子项:",-1,194,115,36,8
-    LTEXT           "触摸功能:",-1,194,132,36,8
-    GROUPBOX        "",-1,17,67,169,22
-    GROUPBOX        "KEY配置信息",-1,2,58,327,94
-    GROUPBOX        "服务器选项",-1,2,12,327,45
-    PUSHBUTTON      "配置",IDC_CONNECT,268,30,50,15
-    RTEXT           "数据库IP:",-1,7,33,38,8
-    RTEXT           "密码:",-1,150,33,21,8
-    LTEXT           "Product Key ID:",-1,16,163,52,8
-    EDITTEXT        IDC_PKID,70,161,108,12,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "擦除Key",IDC_ERASE,195,160,50,15
-    PUSHBUTTON      "烧写Key",IDC_INJECT,264,160,50,15
-    LTEXT           "",IDC_STATUS,0,185,331,12,SS_SUNKEN
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_OADLG, DIALOG
-    BEGIN
-        BOTTOMMARGIN, 199
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-#endif    // 中文(简体) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// 非特定语言(系统默认值) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUSD)
-LANGUAGE LANG_NEUTRAL, SUBLANG_SYS_DEFAULT
-#pragma code_page(936)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_CLOUDOADLG DIALOGEX 0, 0, 332, 200
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
-FONT 8, "MS Shell Dlg", 0, 0, 0x0
-BEGIN
-    CONTROL         "",IDC_SERVIP,"SysIPAddress32",WS_TABSTOP,48,24,96,12
-    EDITTEXT        IDC_DATABASE,48,40,96,13,ES_AUTOHSCROLL
-    EDITTEXT        IDC_PWD,174,40,78,13,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "LicensablePart",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,27,75,62,10
-    CONTROL         "OEMPO",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,94,75,40,10
-    CONTROL         "OEMPart",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,139,75,44,10
-    EDITTEXT        IDC_SELNUMBER,194,73,120,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_BUSINESS,59,95,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_MODEL,235,95,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_TYPE,59,113,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_SUBTYPE,235,113,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_SCREEN,59,131,78,12,ES_AUTOHSCROLL | ES_READONLY
-    EDITTEXT        IDC_TOUCH,235,131,78,12,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "业务名称:",-1,17,98,36,8
-    LTEXT           "外观类型:",-1,17,115,36,8
-    LTEXT           "屏幕尺寸:",-1,17,132,36,8
-    LTEXT           "机器型号:",-1,194,98,36,8
-    LTEXT           "外观子项:",-1,194,115,36,8
-    LTEXT           "触摸功能:",-1,194,132,36,8
-    GROUPBOX        "",-1,17,67,169,22
-    GROUPBOX        "KEY配置信息",-1,2,58,327,94
-    GROUPBOX        "服务器选项",-1,2,12,327,45
-    PUSHBUTTON      "配置",IDC_CONNECT,268,39,50,15
-    RTEXT           "数据库IP:",-1,5,26,38,8
-    RTEXT           "密码:",-1,150,42,21,8
-    LTEXT           "Product Key ID:",-1,16,163,52,8
-    EDITTEXT        IDC_PKID,70,161,108,12,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "擦除Key",IDC_ERASE,195,160,50,15
-    PUSHBUTTON      "烧写Key",IDC_INJECT,264,160,50,15
-    LTEXT           "",IDC_STATUS,0,185,331,12,SS_SUNKEN
-    RTEXT           "数据库名:",-1,5,43,38,8
-    EDITTEXT        IDC_KEYPORT,174,23,78,13,ES_AUTOHSCROLL | ES_NUMBER
-    RTEXT           "端口:",-1,150,26,21,8
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_CLOUDOADLG, DIALOG
-    BEGIN
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_CLOUDOADLG AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-#endif    // 非特定语言(系统默认值) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
@@ -172,14 +24,47 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 // Dialog
 //
 
+IDD_CLOUDOADLG DIALOGEX 0, 0, 332, 200
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_SERVIP,"SysIPAddress32",WS_TABSTOP,75,20,96,12
+    CONTROL         "LicensablePart",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,27,69,62,10
+    CONTROL         "OEMPO",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,94,69,40,10
+    CONTROL         "OEMPart",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,139,69,44,10
+    EDITTEXT        IDC_SELNUMBER,194,67,120,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_BUSINESS,59,89,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_MODEL,235,89,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_TYPE,59,107,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_SUBTYPE,235,107,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_SCREEN,59,125,78,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_TOUCH,235,125,78,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "业务名称:",-1,17,92,36,8
+    LTEXT           "外观类型:",-1,17,109,36,8
+    LTEXT           "屏幕尺寸:",-1,17,126,36,8
+    LTEXT           "机器型号:",-1,194,92,36,8
+    LTEXT           "外观子项:",-1,194,109,36,8
+    LTEXT           "触摸功能:",-1,194,126,36,8
+    GROUPBOX        "",-1,17,61,169,22
+    GROUPBOX        "KEY配置信息",-1,2,50,327,99
+    GROUPBOX        "服务器选项",-1,2,5,327,41
+    PUSHBUTTON      "配置",IDC_CONNECT,219,20,50,15
+    RTEXT           "服务器IP:",-1,32,22,38,8
+    LTEXT           "Product Key ID:",-1,16,163,52,8
+    EDITTEXT        IDC_PKID,70,161,108,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "擦除Key",IDC_ERASE,195,160,50,15
+    PUSHBUTTON      "烧写Key",IDC_INJECT,264,160,50,15
+    LTEXT           "",IDC_STATUS,0,185,331,12,SS_SUNKEN
+END
+
 IDD_HWTOOL_DIALOG DIALOGEX 0, 0, 332, 212
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST | WS_EX_APPWINDOW
 CAPTION "CloudDis(10.5.0.3)"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,0,0,61,14
-    RTEXT           "",IDC_OSVER,73,1,256,13,SS_CENTERIMAGE | WS_DISABLED
+    LTEXT           "",IDC_OSVER,0,0,249,13,SS_CENTERIMAGE | WS_DISABLED,WS_EX_STATICEDGE
+    LTEXT           "",IDC_TOOLVER,249,0,82,13,SS_CENTERIMAGE | WS_DISABLED,WS_EX_STATICEDGE
 END
 
 IDD_CFG DIALOGEX 0, 0, 285, 138
@@ -223,6 +108,10 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
+    IDD_CLOUDOADLG, DIALOG
+    BEGIN
+    END
+
     IDD_HWTOOL_DIALOG, DIALOG
     BEGIN
     END
@@ -294,8 +183,8 @@ IDR_KEY                 ICON                    "res\\key.ico"
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 10,5,16299,3
- PRODUCTVERSION 10,5,16299,3
+ FILEVERSION 10,0,17763,1
+ PRODUCTVERSION 10,0,17763,1
  FILEFLAGSMASK 0x1fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -312,13 +201,13 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Techvision Intelligent Technology Co., Limited"
             VALUE "FileDescription", "Authorized by Kelvin Cheng"
-            VALUE "FileVersion", "10.5.16299.3"
+            VALUE "FileVersion", "10.0.17763.1"
             VALUE "InternalName", "HWTool.exe"
             VALUE "LegalCopyright", "Copyright (C) 2016"
             VALUE "LegalTrademarks", "Techvision"
             VALUE "OriginalFilename", "HWTool.exe"
             VALUE "ProductName", "HWTool Application"
-            VALUE "ProductVersion", "10.5.16299.3"
+            VALUE "ProductVersion", "10.0.17763.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -353,6 +242,11 @@ END
 //
 // AFX_DIALOG_LAYOUT
 //
+
+IDD_CLOUDOADLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 IDD_HWTOOL_DIALOG AFX_DIALOG_LAYOUT
 BEGIN

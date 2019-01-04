@@ -3,12 +3,10 @@
 #include "waitdlg.h"
 
 typedef struct {
-	wchar_t database[32];
 	wchar_t business[32];
 	wchar_t ip[32];
 	wchar_t password[32];
 	int idx;
-	int port;
 	wchar_t para[32];
 	wchar_t sku[32];
 	wchar_t maintype[32];
@@ -20,9 +18,15 @@ typedef struct {
 
 typedef struct
 {
-	wchar_t Name[40];
-	wchar_t Id[40];
-	wchar_t DbConnectionString[128];
+	int ProfileID;
+	int BusinessID;
+	int SiteID;
+	int IsActive;
+	wchar_t ClientID[128];
+	wchar_t SecretID[128];
+	wchar_t SiteName[128];
+	wchar_t BusinessName[128];
+	wchar_t EmailID[128];
 }Configuration;
 
 typedef struct
