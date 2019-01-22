@@ -77,7 +77,6 @@ const char* strCloudOATool =
     </KeyProviderServerLocation>\r\n\
     <Parameters>\r\n\
       <Parameter name=\"%s\" value=\"%s\" />\r\n\
-      <BusinessID>%s</BusinessID>\r\n\
       <OEMOptionalInfo>\r\n\
         <Field>\r\n\
           <Name>ZPC_MODEL_SKU</Name>\r\n\
@@ -102,6 +101,7 @@ const char* strCloudOATool =
       </OEMOptionalInfo>\r\n\
       <TrackingInfo>%s</TrackingInfo>\r\n\
       <SerialNumber>%s</SerialNumber>\r\n\
+      <BusinessID>%s</BusinessID>\r\n\
     </Parameters>\r\n\
   </ServerBased>\r\n\
   <OutputData>\r\n\
@@ -338,7 +338,7 @@ void CCloudOADlg::OnBnClickedConnect()
 		(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 		wcscat(filepath,TEXT("cldtool.cfg"));
 		fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-		sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
+		sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN,m_szCloud);
 		fp.Write(szCfg,(UINT)strlen(szCfg));
 		fp.Close();
 	}
@@ -406,7 +406,7 @@ BOOL CCloudOADlg::OnInitDialog()
 			(wcsrchr(filepath,TEXT('\\')))[1] = 0;
 			wcscat(filepath,TEXT("cldtool.cfg"));
 			fp.Open(filepath,CFile::modeCreate|CFile::modeWrite);
-			sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szCloud,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN);
+			sprintf(szCfg,strCloudOATool,m_szIP,m_szPara,m_szParaValue,m_szSKU,m_szType,m_szSubType,m_szScreenSize,m_szTouch,m_szTrackInfo,m_szSN, m_szCloud);
 			fp.Write(szCfg,(UINT)strlen(szCfg));
 			fp.Close();
 			//SetCurrentDirectory(m_szTempDir);
