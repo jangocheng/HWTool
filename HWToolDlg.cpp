@@ -30,7 +30,6 @@ BEGIN_MESSAGE_MAP(CHWToolDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
-	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB1, &CHWToolDlg::OnTcnSelchangeTab1)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
@@ -53,27 +52,13 @@ BOOL CHWToolDlg::OnInitDialog()
 	_tcscpy(m_szINI,filepath);
 	_tcscat(m_szINI,TEXT("cloud.ini"));
 
-	CRect rc;
-	m_pTab = (CTabCtrl*)GetDlgItem(IDC_TAB1);
-	m_pTab->SetImageList(&m_ImgList);
-	m_pTab->InsertItem(0,TEXT("DIS3.0"),0);
-	m_pTab->InsertItem(1,TEXT("MDOS"),1);
-	m_pTab->GetClientRect(&rc);
-
-	m_OaDlg.Create(IDD_OADLG,this);
-	//m_OaDlg.SetWindowPos(NULL,0,0,0,0,SWP_NOSIZE);
 	m_CloudOADlg.Create(IDD_CLOUDOADLG,this);
-	//m_CloudOADlg.SetWindowPos(NULL,0,0,0,0,SWP_NOSIZE);
+	m_CloudOADlg.SetWindowPos(NULL,0,20,0,0,SWP_NOSIZE);
+	int sel = GetPrivateProfileInt(TEXT("CLOUD"),TEXT("SELECT"),1,m_szINI);
 
-	m_pDlg[0]=&m_OaDlg;
-	m_pDlg[1]=&m_CloudOADlg;
-	for (int i=0; i< 2; i++)
-	{
-		m_pDlg[i]->SetWindowPos(NULL,0,rc.bottom,0,0,SWP_NOSIZE);
-	}
-	int sel = GetPrivateProfileInt(TEXT("CLOUD"),TEXT("SELECT"),0,m_szINI);
-	m_pTab->SetCurSel(sel);
-	m_pDlg[sel]->ShowWindow(SW_SHOW);
+	LOGFONT lf;
+	GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(lf), &lf);
+	m_cFont.CreateFontIndirect(&lf);
 	//DWORD dwWidth,dwHeight;
 	//XDD_GetActiveMonitorPhysicalSize(dwWidth,dwHeight);
     //int nScreenWidth, nScreenHeight; 
@@ -87,11 +72,14 @@ BOOL CHWToolDlg::OnInitDialog()
 	SECURITY_ATTRIBUTES sa={0};
 	HANDLE hReadPipe,hWritePipe;
 	DWORD retcode = -1;
-	char szVer[6] = {0};
+	char szVer[32] = {0};
+	char szOSTitle[256] = { 0 };
+	wchar_t wszOSInfo[256] = { 0 };
 	char szCmdTool[32] = {"oa3tool_"};
-	wchar_t szOSInfo[255];
+	char szOSInfo[255];
 	BOOL bIsx64;
 
+	m_iOSVer = m_iToolVer = 0;
 	sa.bInheritHandle=TRUE;
 	sa.nLength=sizeof SECURITY_ATTRIBUTES;
 	sa.lpSecurityDescriptor=NULL;
@@ -101,7 +89,8 @@ BOOL CHWToolDlg::OnInitDialog()
 	si.wShowWindow=SW_HIDE;
 	si.dwFlags=STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;
 	si.hStdOutput=si.hStdError=hWritePipe;
-	retval=CreateProcessA(NULL,"cmd.exe /c ver",&sa,&sa,TRUE,0,NULL,0,&si,&pi);
+
+	retval=CreateProcessA(NULL,"powershell.exe (Get-WmiObject Win32_OperatingSystem).Caption",&sa,&sa,TRUE,0,NULL,0,&si,&pi);
 	if(retval)
 	{
 		DWORD dwLen,dwRead;
@@ -113,61 +102,62 @@ BOOL CHWToolDlg::OnInitDialog()
 		char *buff=new char [dwLen+1];
 		memset(buff,0,dwLen+1);
 		retval=ReadFile(hReadPipe,buff,dwLen,&dwRead,NULL);
-		char* szToken = strstr(buff,"10.0.");
-		if (szToken)
+		if (buff)
 		{
-			strncpy(szVer,szToken+5,5);
+			strncpy(szOSTitle, buff,strlen(buff)-2);
+		}
+		delete buff;
+	}
+
+	retval=CreateProcessA(NULL,"powershell.exe (Get-WmiObject Win32_OperatingSystem).BuildNumber",&sa,&sa,TRUE,0,NULL,0,&si,&pi);
+	if(retval)
+	{
+		DWORD dwLen,dwRead;
+		WaitForSingleObject(pi.hThread,INFINITE);//等待命令行执行完毕
+		GetExitCodeProcess(pi.hProcess,&retcode);
+		CloseHandle(pi.hThread);
+		CloseHandle(pi.hProcess);
+		dwLen=GetFileSize(hReadPipe,NULL);
+		char *buff=new char [dwLen+1];
+		memset(buff,0,dwLen+1);
+		retval=ReadFile(hReadPipe,buff,dwLen,&dwRead,NULL);
+		if (buff)
+		{
+			strncpy(szVer, buff,strlen(buff)-2);
+			m_iOSVer = atoi(szVer);
 		}
 		delete buff;
 	}
 
 	IsWow64Process(GetCurrentProcess(),&bIsx64);
-	wcscpy(szOSInfo,TEXT("Windows 10 "));
-	if (!strcmp(szVer,"15063"))
-	{
-		strcat(szCmdTool,"rs2_");
-		wcscat(szOSInfo, TEXT("RS2 "));
-	}
-	else if (!strcmp(szVer,"16299"))
-	{
-		strcat(szCmdTool,"rs3_");
-		wcscat(szOSInfo,TEXT("RS3 "));
-	}
-	else if (!strcmp(szVer,"17134"))
-	{
-		strcat(szCmdTool,"rs4_");
-		wcscat(szOSInfo,TEXT("RS4 "));
-	}
-	else
-	{
-		strcat(szCmdTool,"rs2_");
-		wcscat(szOSInfo,TEXT("XXX "));
-	}
+	sprintf(szOSInfo, " 系统版本:%s[%s]", szOSTitle, szVer);
+	SetWindowText(m_szTitle);
+	MultiByteToWideChar(CP_ACP, 0, szOSInfo, -1, wszOSInfo, 256);
+	GetDlgItem(IDC_OSVER)->SetFont(&m_cFont);
+	GetDlgItem(IDC_TOOLVER)->SetFont(&m_cFont);
+	SetDlgItemText(IDC_OSVER, wszOSInfo);
 
 	if (bIsx64)
 	{
 		strcat(szCmdTool,"x64.exe");
-		wcscat(szOSInfo,TEXT("64bit"));
 	}
 	else
 	{
 		strcat(szCmdTool,"x86.exe");
-		wcscat(szOSInfo,TEXT("32bit"));
 	}
 
-	strcpy(m_OaDlg.m_szOATool,szCmdTool);
 	strcpy(m_CloudOADlg.m_szOATool,szCmdTool);
-	char szCmd[255]={0};
-	sprintf(szCmd,"cmd.exe /c %s /report /configfile=oa3toolfile.cfg",szCmdTool);
 
-	SetDlgItemText(IDC_OSVER,szOSInfo);
-	//----------------------------------title-------------------------------------
-	SetWindowText(m_szTitle);
 	if (_access(szCmdTool,0) == -1)
 	{
 		MessageBox(TEXT("缺少OA3刷KEY文件，请联系软件提供商提供此文件！"),TEXT("错误"),MB_ICONERROR);
 		PostQuitMessage(0);
 	}
+	WCHAR wszCmdTool[32] = { 0 };
+	mbstowcs(wszCmdTool, szCmdTool, 32);
+	((CHWToolApp*)AfxGetApp())->GetVersion(wszCmdTool, (LPDWORD)&m_iToolVer);
+	wsprintf(wszOSInfo, TEXT(" OA3工具版本:%d"), m_iToolVer);
+	SetDlgItemText(IDC_TOOLVER, wszOSInfo);
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -209,22 +199,6 @@ HCURSOR CHWToolDlg::OnQueryDragIcon()
 }
 
 
-void CHWToolDlg::OnTcnSelchangeTab1(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	// TODO: Add your control notification handler code here
-	*pResult = 0;
-	int sel = m_pTab->GetCurSel();
-	for (int i=0; i< 2; i++)
-	{
-		m_pDlg[i]->ShowWindow(SW_HIDE);
-	}
-	m_pDlg[sel]->ShowWindow(SW_SHOW);
-	m_pDlg[sel]->SetFocus();
-	CString szSel;
-	szSel.Format(TEXT("%d"),sel);
-	WritePrivateProfileString(TEXT("CLOUD"),TEXT("SELECT"),szSel,m_szINI);
-}
-
 BOOL CHWToolDlg::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: Add your specialized code here and/or call the base class
@@ -239,5 +213,11 @@ BOOL CHWToolDlg::PreTranslateMessage(MSG* pMsg)
 void CHWToolDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
+	m_cFont.DeleteObject();
 	// TODO: Add your message handler code here
+}
+
+BOOL CHWToolDlg::IsAllowPerformed()
+{
+	return (m_iOSVer == m_iToolVer);
 }

@@ -206,8 +206,6 @@ BEGIN_MESSAGE_MAP(CCloudOADlg, CDialog)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_INJECT, &CCloudOADlg::OnBnClickedInject)
 	ON_BN_CLICKED(IDC_ERASE, &CCloudOADlg::OnBnClickedErase)
-	ON_BN_CLICKED(IDC_GIP, &CCloudOADlg::OnBnClickedGip)
-	ON_NOTIFY(IPN_FIELDCHANGED, IDC_SERVIP2, &CCloudOADlg::OnIpnFieldchangedServip2)
 END_MESSAGE_MAP()
 
 
@@ -217,41 +215,19 @@ void CCloudOADlg::OnBnClickedConnect()
 {
 	// TODO: Add your control notification handler code here
 	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);//database
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);//kmt server
 	BYTE szIP[4];
 	char szCfg[2048] = {0};
 	CWaitDlg wDlg;
 	GetDlgItem(IDC_CONNECT)->EnableWindow(0);
-	GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow(0);
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_DISABLED);
 	ip->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 	wsprintf(m_cfg.ip,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
 	CDisConfigDlg Dlg(&m_cfg,1);
-	ip2->GetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
 	if (szIP[0] == 0)
 	{
 		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
 		goto end;
 	}
-	if (szIP[0] == 0)
-	{
-		MessageBox(TEXT("请输入有效的IP地址"),TEXT("IP地址错误"),MB_ICONERROR);
-		goto end;
-	}
-	GetDlgItemText(IDC_DATABASE,m_cfg.database,32);
-	if (wcslen(m_cfg.database) == 0)
-	{
-		MessageBox(TEXT("请输入数据库名"),TEXT("错误"),MB_ICONERROR);
-		goto end;
-	}
-	GetDlgItemText(IDC_PWD,m_cfg.password,32);
-	if (wcslen(m_cfg.password) == 0)
-	{
-		MessageBox(TEXT("请输入密码"),TEXT("错误"),MB_ICONERROR);
-		goto end;
-	}
-	wsprintf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),szIP[0],szIP[1],szIP[2],szIP[3]);
-	m_cfg.nUip = m_nCheckIp;
 	wDlg.Create(IDD_WAITDLG,this);
 	wDlg.SetWindowPos(&CWnd::wndTopMost,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
 	wDlg.CenterWindow(this);
@@ -293,7 +269,7 @@ void CCloudOADlg::OnBnClickedConnect()
 		SetDlgItemText(IDC_TOUCH,m_cfg.hastouch);
 
 		/////////////////////////////////////////////
-		wcstombs(m_szIP,m_cfg.ip2,32);
+		wcstombs(m_szIP, m_cfg.ip, 32);
 		strcpy(m_szPara,szCloudKeyString[m_cfg.idx]);
 		wcstombs(m_szParaValue,m_cfg.para,32);
 		wcstombs(m_szSKU,m_cfg.sku,32);
@@ -314,7 +290,6 @@ void CCloudOADlg::OnBnClickedConnect()
 	}
 end:
 	GetDlgItem(IDC_CONNECT)->EnableWindow();
-	GetParent()->GetDlgItem(IDC_TAB1)->EnableWindow();
 	EnableMenuItem(::GetSystemMenu(GetParent()->m_hWnd,FALSE),SC_CLOSE,MF_BYCOMMAND|MF_ENABLED);
 }
 
@@ -328,8 +303,6 @@ BOOL CCloudOADlg::OnInitDialog()
 	char szCfg[2048] = {0};
 	UINT szIP[4];
 	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
-	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
 
 	WSADATA wsa;
 	WSAStartup(MAKEWORD(2,2),&wsa);
@@ -347,9 +320,6 @@ BOOL CCloudOADlg::OnInitDialog()
 		{
 			fp.Close();
 			m_nIndex = m_cfg.idx;
-			m_nCheckIp = m_cfg.nUip;
-			pIx->SetCheck(m_nCheckIp);
-			SetDlgItemText(IDC_DATABASE,m_cfg.database);
 			SetDlgItemText(IDC_SELNUMBER,m_cfg.para);
 			SetDlgItemText(IDC_BUSINESS,m_cfg.business);
 			SetDlgItemText(IDC_MODEL,m_cfg.sku);
@@ -365,18 +335,9 @@ BOOL CCloudOADlg::OnInitDialog()
 			SetDlgItemText(IDC_PWD,m_cfg.password);
 			swscanf(m_cfg.ip,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
 			ip->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
-			if (!m_nCheckIp)
-			{
-				swscanf(m_cfg.ip2,TEXT("%u.%u.%u.%u"),&szIP[0],&szIP[1],&szIP[2],&szIP[3]);
-				ip->EnableWindow();
-			}
-			else
-			{
-				ip->EnableWindow(0);
-			}
-			ip2->SetAddress(szIP[0],szIP[1],szIP[2],szIP[3]);
+			//ip->EnableWindow(0);
 			/////////////////////////////////////////////////
-			wcstombs(m_szIP,m_cfg.ip2,32);
+			wcstombs(m_szIP, m_cfg.ip, 32);
 			strcpy(m_szPara,szCloudKeyString[m_cfg.idx]);
 			wcstombs(m_szParaValue,m_cfg.para,32);
 			wcstombs(m_szSKU,m_cfg.sku,32);
@@ -1133,6 +1094,12 @@ void CCloudOADlg::OnDestroy()
 void CCloudOADlg::OnBnClickedInject()
 {
 	// TODO: Add your control notification handler code here
+	CHWToolDlg* pDlg = (CHWToolDlg*)GetParent();
+	if (!pDlg->IsAllowPerformed())
+	{
+		MessageBox(TEXT("系统版本与刷KEY工具版本不符，请使用与系统一致的工具版本!"), TEXT("版本错误"), MB_ICONERROR);
+		return;
+	}
 	KillTimer(1);
 	GetDlgItem(IDC_CONNECT)->EnableWindow(0);
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
@@ -1147,6 +1114,12 @@ void CCloudOADlg::OnBnClickedInject()
 void CCloudOADlg::OnBnClickedErase()
 {
 	// TODO: Add your control notification handler code here
+	CHWToolDlg* pDlg = (CHWToolDlg*)GetParent();
+	if (!pDlg->IsAllowPerformed())
+	{
+		MessageBox(TEXT("系统版本与刷KEY工具版本不符，请使用与系统一致的工具版本!"), TEXT("版本错误"), MB_ICONERROR);
+		return;
+	}
 	GetDlgItem(IDC_CONNECT)->EnableWindow(0);
 	GetDlgItem(IDC_ERASE)->EnableWindow(0);
 	GetDlgItem(IDC_INJECT)->EnableWindow(0);
@@ -1246,45 +1219,8 @@ void CCloudOADlg::OnOK()
 	//CDialog::OnOK();
 }
 
-void CCloudOADlg::OnBnClickedGip()
-{
-	// TODO: Add your control notification handler code here
-	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
-	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
-	DWORD dwIP;
-	ip2->GetAddress(dwIP);
-	m_nCheckIp = pIx->GetCheck();
-	if (m_nCheckIp)
-	{
-		GetDlgItem(IDC_SERVIP)->EnableWindow(0);
-		ip->SetAddress(dwIP);
-	}
-	else
-	{
-		GetDlgItem(IDC_SERVIP)->EnableWindow();
-	}
-}
-
 BOOL CCloudOADlg::GetOA3Parameter(char* szCmd, int nIdx)
 {
 
 	return TRUE;
-}
-
-void CCloudOADlg::OnIpnFieldchangedServip2(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMIPADDRESS pIPAddr = reinterpret_cast<LPNMIPADDRESS>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-	CButton* pIx = (CButton*)GetDlgItem(IDC_GIP);
-	CIPAddressCtrl* ip = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP);
-	CIPAddressCtrl* ip2 = (CIPAddressCtrl*)GetDlgItem(IDC_SERVIP2);
-	DWORD dwIP;
-	ip2->GetAddress(dwIP);
-	m_nCheckIp = pIx->GetCheck();
-	if (m_nCheckIp)
-	{
-		ip->SetAddress(dwIP);
-	}
-	*pResult = 0;
 }

@@ -75,3 +75,4 @@
 
 #import "c:\program files\common files\system\ado\msado15.dll" no_namespace rename("EOF","adoEOF")
 #pragma warning(disable:4996)
+#include <io.h>
